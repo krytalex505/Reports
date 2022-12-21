@@ -393,9 +393,9 @@
             this.panel4.Controls.Add(this.button10);
             this.panel4.Controls.Add(this.button11);
             this.panel4.Controls.Add(this.button12);
-            this.panel4.Location = new System.Drawing.Point(3, 3);
+            this.panel4.Location = new System.Drawing.Point(502, 159);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(630, 177);
+            this.panel4.Size = new System.Drawing.Size(131, 21);
             this.panel4.TabIndex = 11;
             this.panel4.Visible = false;
             // 
@@ -474,9 +474,9 @@
             this.panel3.Controls.Add(this.button6);
             this.panel3.Controls.Add(this.button7);
             this.panel3.Controls.Add(this.dateTimePicker4);
-            this.panel3.Location = new System.Drawing.Point(324, 97);
+            this.panel3.Location = new System.Drawing.Point(356, 98);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(129, 23);
+            this.panel3.Size = new System.Drawing.Size(97, 22);
             this.panel3.TabIndex = 10;
             this.panel3.Visible = false;
             // 

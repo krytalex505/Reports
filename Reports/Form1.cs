@@ -6,49 +6,74 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 using System.IO;
+using Spire.DataExport.DBF;
+using System.Data.OleDb;
+using Reports.models;
+using Reports.service;
 
 namespace Reports
 {
     public partial class Form1 : Form
     {
         private readonly List<Panel> _addpanels2;
+
+        private List<Pay> pays = new List<Pay>();
+        private DaoService daoService;
         Excel.Application xlApp;
         Excel.Worksheet xlSheet;
         Excel.Range xlSheetRange;
         public SqlConnection con;
         public string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-
+        private DateTime actualDate;
         public Form1()
         {
-                con = new SqlConnection("Data Source=86.57.137.8,1433;Initial Catalog=ap6pay;Persist Security Info=True;User ID=admin;Password=682830");
-                InitializeComponent();
-                _addpanels2 = new List<Panel> { panel1, panel3, panel4 };
-                Ap6Pay();
-                Sum();
+            con = new SqlConnection("Data Source=86.57.137.8,1433;Initial Catalog=ap6pay;Persist Security Info=True;User ID=admin;Password=682830");
+            InitializeComponent();
+            daoService = new DaoService();
+            _addpanels2 = new List<Panel> { panel1, panel3, panel4 };
+            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+            //Ap6Pay();
+            //Sum();
+            dataGridView1.AutoGenerateColumns = true;
+            dataGridView1.DataSource = pays;
+            dataGridView1.Columns["Id"].Visible = false;
 
+            pays.AddRange(daoService.GetPaysOfMonth(DateTime.Now));
         }
 
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            daoService.CloseConnection();
+        }
+
+        private void AddColumn(string name, string headerText)
+        {
+            DataGridViewColumn col = new DataGridViewColumn();
+            col.HeaderText = headerText;
+            col.Name = name;
+            dataGridView1.Columns.Add(col);
+        }
         public void GetDataTabell78()
         {
 
-                string date6 = dateTimePicker2.Value.ToString("dd.MM.yyyy 00:00");
-                string date7 = dateTimePicker2.Value.ToString("dd.MM.yyyy 23:59");
-                string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker2.Value.Month + "_" + dateTimePicker2.Value.Year + " Where  tab_no='" + maskedTextBox1.Text + "' And date between '" + date6 + "' And '" + date7 + "'";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con );
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+            string date6 = dateTimePicker2.Value.ToString("dd.MM.yyyy 00:00");
+            string date7 = dateTimePicker2.Value.ToString("dd.MM.yyyy 23:59");
+            string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker2.Value.Month + "_" + dateTimePicker2.Value.Year + " Where  tab_no='" + maskedTextBox1.Text + "' And date between '" + date6 + "' And '" + date7 + "'";
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+            DataSet dataSet = new DataSet();
+            sqlDataAdapter.Fill(dataSet);
+            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
 
         }
 
         public void GetDataTabell()
         {
 
-                string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where  tab_no='" + maskedTextBox1.Text + "'";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+            string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where  tab_no='" + maskedTextBox1.Text + "'";
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+            DataSet dataSet = new DataSet();
+            sqlDataAdapter.Fill(dataSet);
+            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
 
 
         }
@@ -56,11 +81,11 @@ namespace Reports
         public void GetDataForMonthKitchen()
         {
 
-                string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 521";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+            string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 521";
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+            DataSet dataSet = new DataSet();
+            sqlDataAdapter.Fill(dataSet);
+            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
 
 
         }
@@ -69,21 +94,21 @@ namespace Reports
         public void GetDataForMonthhShop()
         {
 
-                string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 518";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+            string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 518";
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+            DataSet dataSet = new DataSet();
+            sqlDataAdapter.Fill(dataSet);
+            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
 
         }
         public void GetDataForMonthh()
         {
 
-                string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+            string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "";
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+            DataSet dataSet = new DataSet();
+            sqlDataAdapter.Fill(dataSet);
+            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
 
         }
 
@@ -91,48 +116,51 @@ namespace Reports
         public void Ap6Pay78778()
         {
 
-                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", con);
-                DataTable dt = new DataTable();
-                ada.Fill(dt);
-                if (dt.Rows.Count > 0)
-                {
-                    string date9 = DateTime.UtcNow.ToString("dd.MM.yyyy 00:00");
-                    string date10 = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
+            SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", con);
+            DataTable dt = new DataTable();
+            ada.Fill(dt);
+            if (dt.Rows.Count > 0)
+            {
+                string date9 = DateTime.UtcNow.ToString("dd.MM.yyyy 00:00");
+                string date10 = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
 
-                    string command = "SELECT tab_no ,summa,type,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " where date between '" + date9 + "' and '" + date10 + "'";
-                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                    DataSet dataSet = new DataSet();
-                    sqlDataAdapter.Fill(dataSet);
-                    dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-                }
-                else
-                {
-                    MessageBox.Show("Данных за текущий месяц не существует!");
-                }
+                string command = "SELECT tab_no ,summa,type,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " where date between '" + date9 + "' and '" + date10 + "'";
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+                DataSet dataSet = new DataSet();
+                sqlDataAdapter.Fill(dataSet);
+                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+            }
+            else
+            {
+                MessageBox.Show("Данных за текущий месяц не существует!");
+            }
 
         }
 
 
         public void Ap6Pay()
         {
+            actualDate = DateTime.Now;
 
-                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", con);
-                DataTable dt = new DataTable();
-                ada.Fill(dt);
-                if (dt.Rows.Count > 0)
-                {
-                    string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
-                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                    DataSet dataSet = new DataSet();
-                    sqlDataAdapter.Fill(dataSet);
-                    dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-                }
-                else
-                {
-                    MessageBox.Show("Данных за текущий месяц не существует!");
-                }
+            //if(actualDate.Year == date.Year && mouth)
+            //sql
 
+            SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", con);
+            DataTable dt = new DataTable();
+            ada.Fill(dt);
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show("Данных за текущий месяц не существует!");
+                return;
+            }
+            // переделать
+            string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
+            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+            DataSet dataSet = new DataSet();
+            sqlDataAdapter.Fill(dataSet);
+            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
         }
+
         public void panelhide()
         {
             panel1.Visible = false;
@@ -143,130 +171,135 @@ namespace Reports
         private DataTable GetDataForMonthkitchenhedproducts()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО, summa As Сумма, val As Собственная,val1 As Готовая, type As Код FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type = 521";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО, summa As Сумма, val As Собственная,val1 As Готовая, type As Код FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type = 521";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
         private DataTable GetDataTabel()
         {
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where  tab_no='" + maskedTextBox1.Text + "'";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where  tab_no='" + maskedTextBox1.Text + "'";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
         private DataTable GetDataShop()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type=518 ";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type=518 ";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
 
 
         private DataTable GetDataForMonthShop()
         {
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, type As Тип FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 518";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, type As Тип FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 518";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
 
         private DataTable GetDataForMonthKitchenDataPicker()
         {
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 521";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 521";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
 
@@ -274,132 +307,138 @@ namespace Reports
         private DataTable GetDataForMonth()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
         private DataTable GetDataTodayShop()
         {
-                DataTable dt = new DataTable();
-                try
-                {
+            DataTable dt = new DataTable();
+            try
+            {
 
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
         private DataTable GetDataTodaykitchen()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
         private DataTable GetDataToday()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "'";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
+            DataTable dt = new DataTable();
+            try
+            {
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "'";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
 
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
         private DataTable GetDataDayKitchen()
         {
-                DataTable dt = new DataTable();
-                try
-                {
-                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 521";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 521";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
 
@@ -407,29 +446,30 @@ namespace Reports
         private DataTable GetDataDayShop()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 518";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 518";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
 
@@ -438,55 +478,56 @@ namespace Reports
         private DataTable GetDataDay()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+                // зачем выгружать из sql, если есть таблица
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
 
         private DataTable GetDataTotal()
         {
 
-                DataTable dt = new DataTable();
-                try
-                {
-                    string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
-                    SqlCommand comm = new SqlCommand(query, con);
-                    con.Open();
-                    SqlDataAdapter da = new SqlDataAdapter(comm);
-                    DataSet ds = new DataSet();
-                    da.Fill(ds);
-                    dt = ds.Tables[0];
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    con.Close();
-                    con.Dispose();
-                }
-                return dt;
+            DataTable dt = new DataTable();
+            try
+            {
+                string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
+                SqlCommand comm = new SqlCommand(query, con);
+                con.Open();
+                SqlDataAdapter da = new SqlDataAdapter(comm);
+                DataSet ds = new DataSet();
+                da.Fill(ds);
+                dt = ds.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                con.Close();
+                con.Dispose();
+            }
+            return dt;
         }
         private void button3_Click(object sender, EventArgs e)
         {
@@ -498,35 +539,30 @@ namespace Reports
         private void button2_Click(object sender, EventArgs e)
         {
 
+            // 3 одниковых sql запроса в одном методе - 3 инфаркта у Курочки
+            if (radioButton1.Checked)
+            {
 
-                if (radioButton1.Checked)
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
+                // return
                 {
-
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
+                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+                    SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
+                    DataTable dt2 = new DataTable();
+                    ada2.Fill(dt2);
+                    if (dt2.Rows.Count > 0)
                     {
-                        string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                        string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
-                        DataTable dt2 = new DataTable();
-                        ada2.Fill(dt2);
-                        if (dt2.Rows.Count > 0)
-                        {
-                            string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 518";
-                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                            DataSet dataSet = new DataSet();
-                            sqlDataAdapter.Fill(dataSet);
-                            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-                            Sum();
-                            radioButton1.Checked = false;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Данных за выбранный период не существует!");
-                            radioButton1.Checked = false;
-                        }
+                        string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 518";
+                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+                        DataSet dataSet = new DataSet();
+                        sqlDataAdapter.Fill(dataSet);
+                        dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+                        Sum();
+                        radioButton1.Checked = false;
                     }
                     else
                     {
@@ -534,33 +570,33 @@ namespace Reports
                         radioButton1.Checked = false;
                     }
                 }
-                else if (radioButton2.Checked)
+                else
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
+                    MessageBox.Show("Данных за выбранный период не существует!");
+                    radioButton1.Checked = false;
+                }
+            }
+            else if (radioButton2.Checked)
+            {
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+                    SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
+                    DataTable dt2 = new DataTable();
+                    ada2.Fill(dt2);
+                    if (dt2.Rows.Count > 0)
                     {
-                        string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                        string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
-                        DataTable dt2 = new DataTable();
-                        ada2.Fill(dt2);
-                        if (dt2.Rows.Count > 0)
-                        {
-                            string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 521";
-                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                            DataSet dataSet = new DataSet();
-                            sqlDataAdapter.Fill(dataSet);
-                            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-                            Sum();
-                            radioButton2.Checked = false;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Данных за выбранный период не существует!");
-                            radioButton2.Checked = false;
-                        }
+                        string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 521";
+                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+                        DataSet dataSet = new DataSet();
+                        sqlDataAdapter.Fill(dataSet);
+                        dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+                        Sum();
+                        radioButton2.Checked = false;
                     }
                     else
                     {
@@ -569,42 +605,48 @@ namespace Reports
                     }
                 }
                 else
-                if (MessageBox.Show("Вы хотите вывести общие данные?", "Внимание", MessageBoxButtons.YesNo,
-                          MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
+                    MessageBox.Show("Данных за выбранный период не существует!");
+                    radioButton2.Checked = false;
+                }
+            }
+            else
+            if (MessageBox.Show("Вы хотите вывести общие данные?", "Внимание", MessageBoxButtons.YesNo,
+                      MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+            {
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+                    SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
+                    DataTable dt2 = new DataTable();
+                    ada2.Fill(dt2);
+                    if (dt2.Rows.Count > 0)
                     {
-                        string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                        string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
-                        DataTable dt2 = new DataTable();
-                        ada2.Fill(dt2);
-                        if (dt2.Rows.Count > 0)
-                        {
-                            string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'";
-                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
-                            DataSet dataSet = new DataSet();
-                            sqlDataAdapter.Fill(dataSet);
-                            dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-                            Sum();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Данных за выбранный период не существует!");
-                        }
+                        string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'";
+                        SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
+                        DataSet dataSet = new DataSet();
+                        sqlDataAdapter.Fill(dataSet);
+                        dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
+                        Sum();
                     }
-                    else
+                    else  // красивая лесенка
                     {
                         MessageBox.Show("Данных за выбранный период не существует!");
                     }
                 }
                 else
                 {
-                    MessageBox.Show("Чтобы выводить определённые данные, выберите код!!");
+                    MessageBox.Show("Данных за выбранный период не существует!");
                 }
+            }
+            else
+            {
+                MessageBox.Show("Чтобы выводить определённые данные, выберите код!!");
+            }
 
         }
 
@@ -612,77 +654,79 @@ namespace Reports
         {
 
 
-                MessageBox.Show("Данные экспортированы в Excel");
-                xlApp = new Excel.Application();
-                xlApp = new Excel.Application();
-                try
-                {
-                    xlApp.Workbooks.Add(Type.Missing);
-                    xlApp.Interactive = false;
-                    xlApp.EnableEvents = false;
-                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                    xlSheet.Name = "Данные";
-                    DataTable dt = GetDataTabel();
-                    int collInd = 0;
-                    int rowInd = 0;
-                    string data = "";
+            MessageBox.Show("Данные экспортированы в Excel");
+            xlApp = new Excel.Application();
+            xlApp = new Excel.Application();
+            try
+            {
+                xlApp.Workbooks.Add(Type.Missing);
+                xlApp.Interactive = false;
+                xlApp.EnableEvents = false;
+                xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                xlSheet.Name = "Данные";
+                DataTable dt = GetDataTabel();
+                int collInd = 0;
+                int rowInd = 0;
+                string data = "";
 
-                    for (int i = 0; i < dt.Columns.Count; i++)
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    data = dt.Columns[i].ColumnName.ToString();
+                    xlSheet.Cells[1, i + 1] = data;
+                    xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                }
+
+                for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                {
+
+                    for (collInd = 0; collInd < dt.Columns.Count; collInd++)
                     {
-                        data = dt.Columns[i].ColumnName.ToString();
-                        xlSheet.Cells[1, i + 1] = data;
-                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                        data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                        xlSheet.Cells[rowInd + 2, collInd + 1] = data;
+
                     }
 
-                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                    {
-
-                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                        {
-                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                            xlSheet.Cells[rowInd + 2, collInd + 1] = data;
-
-                        }
-
-                    }
-                    xlSheet.Cells[rowInd + 3, collInd - 5] = "Итоговая сумма:";
-                    xlSheet.Cells[rowInd + 3, collInd - 4].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                    xlSheetRange = xlSheet.UsedRange;
-                    xlSheetRange.Columns.AutoFit();
-                    xlSheetRange.Cells.HorizontalAlignment = -4108;
-                    xlSheetRange.Cells.VerticalAlignment = -4108;
-                    xlSheetRange.Rows.AutoFit();
-                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 2] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 3] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 4] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 5] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 6] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 7] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[1, 8] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 3, collInd - 5] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 3, collInd - 4] as Excel.Range).Font.Bold = true;
-
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-                finally
-                {
+                xlSheet.Cells[rowInd + 3, collInd - 5] = "Итоговая сумма:";
+                xlSheet.Cells[rowInd + 3, collInd - 4].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                xlSheetRange = xlSheet.UsedRange;
+                xlSheetRange.Columns.AutoFit();
+                xlSheetRange.Cells.HorizontalAlignment = -4108;
+                xlSheetRange.Cells.VerticalAlignment = -4108;
+                xlSheetRange.Rows.AutoFit();
+                // жесть... Если работаешь с range, то зачем к каждой ячейке ставить стили
+                (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 2] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 3] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 4] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 5] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 6] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 7] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[1, 8] as Excel.Range).Font.Bold = true;
+                xlSheet.get_Range("A2:A2", Type.Missing);
+                (xlSheetRange.Cells[rowInd + 3, collInd - 5] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 3, collInd - 4] as Excel.Range).Font.Bold = true;
 
-                    xlApp.Visible = true;
-                    xlApp.Interactive = true;
-                    xlApp.ScreenUpdating = true;
-                    xlApp.UserControl = true;
-                    releaseObject(xlSheetRange);
-                    releaseObject(xlSheet);
-                    releaseObject(xlApp);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
 
-                }
+                xlApp.Visible = true;
+                xlApp.Interactive = true;
+                xlApp.ScreenUpdating = true;
+                xlApp.UserControl = true;
+                releaseObject(xlSheetRange);
+                releaseObject(xlSheet);
+                releaseObject(xlApp);
+
+            }
 
         }
 
@@ -690,87 +734,87 @@ namespace Reports
         {
 
 
-                MessageBox.Show("Данные экспортированы в Excel");
-                xlApp = new Excel.Application();
-                xlApp = new Excel.Application();
-                try
-                {
-                    xlApp.Workbooks.Add(Type.Missing);
-                    xlApp.Interactive = false;
-                    xlApp.EnableEvents = false;
-                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                    xlSheet.Name = "Данные";
-                    DataTable dt = GetDataForMonthKitchenDataPicker();
-                    int collInd = 0;
-                    int rowInd = 0;
-                    string data = "";
+            MessageBox.Show("Данные экспортированы в Excel");
+            xlApp = new Excel.Application();
+            xlApp = new Excel.Application();
+            try
+            {
+                xlApp.Workbooks.Add(Type.Missing);
+                xlApp.Interactive = false;
+                xlApp.EnableEvents = false;
+                xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                xlSheet.Name = "Данные";
+                DataTable dt = GetDataForMonthKitchenDataPicker();
+                int collInd = 0;
+                int rowInd = 0;
+                string data = "";
 
-                    for (int i = 0; i < dt.Columns.Count; i++)
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    data = dt.Columns[i].ColumnName.ToString();
+                    xlSheet.Cells[2, i + 1] = data;
+                    xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                }
+
+                for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                {
+
+                    for (collInd = 0; collInd < dt.Columns.Count; collInd++)
                     {
-                        data = dt.Columns[i].ColumnName.ToString();
-                        xlSheet.Cells[2, i + 1] = data;
-                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                        data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                        xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
                     }
 
-                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                    {
-
-                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                        {
-                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                        }
-
-                    }
-
-                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
-                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                    xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
-                    xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
-                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                    xlSheet.get_Range("A1", "G1").Merge();
-                    xlSheet.Cells[1, 1] = "Ведомость по столовой за " + dateTimePicker4.Value.Month + " месяц " + dateTimePicker4.Value.Year + " года";
-                    xlSheetRange = xlSheet.UsedRange;
-                    xlSheetRange.Columns.AutoFit();
-                    xlSheetRange.Cells.HorizontalAlignment = -4108;
-                    xlSheetRange.Cells.VerticalAlignment = -4108;
-                    xlSheetRange.Rows.AutoFit();
-
-                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                    (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-                finally
-                {
 
-                    xlApp.Visible = true;
-                    xlApp.Interactive = true;
-                    xlApp.ScreenUpdating = true;
-                    xlApp.UserControl = true;
-                    releaseObject(xlSheetRange);
-                    releaseObject(xlSheet);
-                    releaseObject(xlApp);
+                xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
+                xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
+                xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
+                Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                xlSheet.get_Range("A1", "G1").Merge();
+                xlSheet.Cells[1, 1] = "Ведомость по столовой за " + dateTimePicker4.Value.Month + " месяц " + dateTimePicker4.Value.Year + " года";
+                xlSheetRange = xlSheet.UsedRange;
+                xlSheetRange.Columns.AutoFit();
+                xlSheetRange.Cells.HorizontalAlignment = -4108;
+                xlSheetRange.Cells.VerticalAlignment = -4108;
+                xlSheetRange.Rows.AutoFit();
 
-                }
+                (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+
+                xlApp.Visible = true;
+                xlApp.Interactive = true;
+                xlApp.ScreenUpdating = true;
+                xlApp.UserControl = true;
+                releaseObject(xlSheetRange);
+                releaseObject(xlSheet);
+                releaseObject(xlApp);
+
+            }
 
         }
 
@@ -780,6 +824,284 @@ namespace Reports
         {
 
 
+            MessageBox.Show("Данные экспортированы в Excel"); // уже?)
+            xlApp = new Excel.Application();
+            xlApp = new Excel.Application();
+            try
+            {
+                xlApp.Workbooks.Add(Type.Missing);
+                xlApp.Interactive = false;
+                xlApp.EnableEvents = false;
+                xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                xlSheet.Name = "Данные";
+                DataTable dt = GetDataForMonthShop();
+                int collInd = 0;
+                int rowInd = 0;
+                string data = "";
+
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    data = dt.Columns[i].ColumnName.ToString();
+                    xlSheet.Cells[2, i + 1] = data;
+                    xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                }
+
+                for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                {
+
+                    for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                    {
+                        data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                        xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                    }
+
+                }
+
+                xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
+                xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                xlSheet.get_Range("A1", "E1").Merge();
+                xlSheet.Cells[1, 1] = "Ведомость по магазину за " + dateTimePicker4.Value.Month + " месяц " + dateTimePicker4.Value.Year + " года";
+                xlSheetRange = xlSheet.UsedRange;
+                xlSheetRange.Columns.AutoFit();
+                xlSheetRange.Cells.HorizontalAlignment = -4108;
+                xlSheetRange.Cells.VerticalAlignment = -4108;
+                xlSheetRange.Rows.AutoFit();
+
+                (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+
+                xlApp.Visible = true;
+                xlApp.Interactive = true;
+                xlApp.ScreenUpdating = true;
+                xlApp.UserControl = true;
+                releaseObject(xlSheetRange);
+                releaseObject(xlSheet);
+                releaseObject(xlApp);
+
+            }
+        }
+
+
+        public void ReportForMonth()
+        {
+
+
+            MessageBox.Show("Данные экспортированы в Excel");
+            xlApp = new Excel.Application();
+            xlApp = new Excel.Application();
+            try
+            {
+                xlApp.Workbooks.Add(Type.Missing);
+                xlApp.Interactive = false;
+                xlApp.EnableEvents = false;
+                xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                xlSheet.Name = "Данные";
+                DataTable dt = GetDataForMonth();
+                int collInd = 0;
+                int rowInd = 0;
+                string data = "";
+
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    data = dt.Columns[i].ColumnName.ToString();
+                    xlSheet.Cells[2, i + 1] = data;
+                    xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                }
+
+                for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                {
+
+                    for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                    {
+                        data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                        xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                    }
+
+                }
+
+                xlSheet.Cells[rowInd + 4, collInd - 4] = "Итоговая сумма:";
+                xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                xlSheet.get_Range("A1", "G1").Merge();
+                xlSheet.Cells[1, 1] = "Ведомость за " + dateTimePicker4.Value.Month + " месяц " + dateTimePicker4.Value.Year + " года";
+                xlSheetRange = xlSheet.UsedRange;
+                xlSheetRange.Columns.AutoFit();
+                xlSheetRange.Cells.HorizontalAlignment = -4108;
+                xlSheetRange.Cells.VerticalAlignment = -4108;
+                xlSheetRange.Rows.AutoFit();
+
+                (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+
+                xlApp.Visible = true;
+                xlApp.Interactive = true;
+                xlApp.ScreenUpdating = true;
+                xlApp.UserControl = true;
+                releaseObject(xlSheetRange);
+                releaseObject(xlSheet);
+                releaseObject(xlApp);
+
+            }
+
+        }
+
+        public void ReportDate()
+        {
+
+            SqlDataAdapter ada3 = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
+            DataTable dt3 = new DataTable();
+            ada3.Fill(dt3);
+            if (dt3.Rows.Count > 0)
+            {
+
+                string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+                string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+                string date3 = dateTimePicker1.Value.ToString("dd.MM.yyyy");
+                DataTable dt1 = new DataTable();
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
+                ada.Fill(dt1);
+                if (dt1.Rows.Count > 0)
+                {
+                    MessageBox.Show("Данные экспортированы в Excel");
+                    xlApp = new Excel.Application();
+                    xlApp = new Excel.Application();
+                    try
+                    {
+                        xlApp.Workbooks.Add(Type.Missing);
+                        xlApp.Interactive = false;
+                        xlApp.EnableEvents = false;
+                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                        xlSheet.Name = "Данные";
+                        DataTable dt = GetDataDay();
+                        int collInd = 0;
+                        int rowInd = 0;
+                        string data = "";
+
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            data = dt.Columns[i].ColumnName.ToString();
+                            xlSheet.Cells[2, i + 1] = data;
+                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                        }
+
+                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                        {
+
+                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                            {
+                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                            }
+
+                        }
+                        xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
+                        xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                        xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
+                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
+                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                        xlSheet.get_Range("A1", "G1").Merge();
+                        xlSheet.Cells[1, 1] = "Ведомость за " + date3 + "";
+                        xlSheetRange = xlSheet.UsedRange;
+                        xlSheetRange.Columns.AutoFit();
+                        xlSheetRange.Cells.HorizontalAlignment = -4108;
+                        xlSheetRange.Cells.VerticalAlignment = -4108;
+                        xlSheetRange.Rows.AutoFit();
+                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString());
+                    }
+                    finally
+                    {
+
+                        xlApp.Visible = true;
+                        xlApp.Interactive = true;
+                        xlApp.ScreenUpdating = true;
+                        xlApp.UserControl = true;
+                        releaseObject(xlSheetRange);
+                        releaseObject(xlSheet);
+                        releaseObject(xlApp);
+
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Данных за выбранный период не существует!");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных за выбранный период не существует!");
+            }
+        }
+
+
+        public void ReportShop()
+        {
+
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type=518 ", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
                 MessageBox.Show("Данные экспортированы в Excel");
                 xlApp = new Excel.Application();
                 xlApp = new Excel.Application();
@@ -790,7 +1112,7 @@ namespace Reports
                     xlApp.EnableEvents = false;
                     xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
                     xlSheet.Name = "Данные";
-                    DataTable dt = GetDataForMonthShop();
+                    DataTable dt = GetDataShop();
                     int collInd = 0;
                     int rowInd = 0;
                     string data = "";
@@ -813,20 +1135,292 @@ namespace Reports
                         }
 
                     }
-
                     xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
                     xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
                     Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
                     tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
                     tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
                     xlSheet.get_Range("A1", "E1").Merge();
-                    xlSheet.Cells[1, 1] = "Ведомость по магазину за " + dateTimePicker4.Value.Month + " месяц " + dateTimePicker4.Value.Year + " года";
+                    xlSheet.Cells[1, 1] = "Ведомость по магазину за " + DateTime.Now.Month + " месяц " + DateTime.Now.Year + " года";
                     xlSheetRange = xlSheet.UsedRange;
                     xlSheetRange.Columns.AutoFit();
                     xlSheetRange.Cells.HorizontalAlignment = -4108;
                     xlSheetRange.Cells.VerticalAlignment = -4108;
                     xlSheetRange.Rows.AutoFit();
+                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
 
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+                finally
+                {
+
+                    xlApp.Visible = true;
+                    xlApp.Interactive = true;
+                    xlApp.ScreenUpdating = true;
+                    xlApp.UserControl = true;
+                    releaseObject(xlSheetRange);
+                    releaseObject(xlSheet);
+                    releaseObject(xlApp);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных по магазину за месяц не было!");
+            }
+        }
+
+        public void ReportForkitchenproducts()
+        {
+
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО, summa As Сумма, val As Собственная,val1 As Готовая, type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type = 521", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
+                MessageBox.Show("Данные экспортированы в Excel");
+                xlApp = new Excel.Application();
+                xlApp = new Excel.Application();
+                try
+                {
+                    xlApp.Workbooks.Add(Type.Missing);
+                    xlApp.Interactive = false;
+                    xlApp.EnableEvents = false;
+                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                    xlSheet.Name = "Данные";
+                    DataTable dt = GetDataForMonthkitchenhedproducts();
+                    int collInd = 0;
+                    int rowInd = 0;
+                    string data = "";
+
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data = dt.Columns[i].ColumnName.ToString();
+                        xlSheet.Cells[2, i + 1] = data;
+                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                    }
+                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                    {
+
+                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                        {
+                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                        }
+                    }
+                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
+                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
+                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                    xlSheet.get_Range("A1", "G1").Merge();
+                    xlSheet.Cells[1, 1] = "Ведомость по столовой за " + DateTime.Now.Month + " месяц " + DateTime.Now.Year + " года";
+                    xlSheetRange = xlSheet.UsedRange;
+                    xlSheetRange.Columns.AutoFit();
+                    xlSheetRange.Cells.HorizontalAlignment = -4108;
+                    xlSheetRange.Cells.VerticalAlignment = -4108;
+                    xlSheetRange.Rows.AutoFit();
+                    (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+                finally
+                {
+
+                    xlApp.Visible = true;
+                    xlApp.Interactive = true;
+                    xlApp.ScreenUpdating = true;
+                    xlApp.UserControl = true;
+                    releaseObject(xlSheetRange);
+                    releaseObject(xlSheet);
+                    releaseObject(xlApp);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных по столовой не было!");
+            }
+        }
+
+
+        public void ReportKitchenPerDate()
+        {
+
+            string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+            string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
+                MessageBox.Show("Данные экспортированы в Excel");
+                xlApp = new Excel.Application();
+                xlApp = new Excel.Application();
+                try
+                {
+                    xlApp.Workbooks.Add(Type.Missing);
+                    xlApp.Interactive = false;
+                    xlApp.EnableEvents = false;
+                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                    xlSheet.Name = "Данные";
+                    DataTable dt = GetDataDayKitchen();
+                    int collInd = 0;
+                    int rowInd = 0;
+                    string data = "";
+
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data = dt.Columns[i].ColumnName.ToString();
+                        xlSheet.Cells[2, i + 1] = data;
+                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                    }
+                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                    {
+
+                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                        {
+                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                        }
+                    }
+                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
+                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
+                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                    xlSheet.get_Range("A1", "G1").Merge();
+                    xlSheet.Cells[1, 1] = "Ведомость по столовой за " + dateTimePicker1.Value.ToString("dd.MM.yyyy") + "";
+                    xlSheetRange = xlSheet.UsedRange;
+                    xlSheetRange.Columns.AutoFit();
+                    xlSheetRange.Cells.HorizontalAlignment = -4108;
+                    xlSheetRange.Cells.VerticalAlignment = -4108;
+                    xlSheetRange.Rows.AutoFit();
+                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+                finally
+                {
+
+                    xlApp.Visible = true;
+                    xlApp.Interactive = true;
+                    xlApp.ScreenUpdating = true;
+                    xlApp.UserControl = true;
+                    releaseObject(xlSheetRange);
+                    releaseObject(xlSheet);
+                    releaseObject(xlApp);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных по столовой за выбранный период не было!");
+            }
+
+        }
+
+
+
+        public void ReportShopPerDate()
+        {
+
+            string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
+            string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
+                MessageBox.Show("Данные экспортированы в Excel");
+                xlApp = new Excel.Application();
+                xlApp = new Excel.Application();
+                try
+                {
+                    xlApp.Workbooks.Add(Type.Missing);
+                    xlApp.Interactive = false;
+                    xlApp.EnableEvents = false;
+                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                    xlSheet.Name = "Данные";
+                    DataTable dt = GetDataDayShop();
+                    int collInd = 0;
+                    int rowInd = 0;
+                    string data = "";
+
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data = dt.Columns[i].ColumnName.ToString();
+                        xlSheet.Cells[2, i + 1] = data;
+                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                    }
+                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                    {
+
+                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                        {
+                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                        }
+                    }
+                    xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
+                    xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                    xlSheet.get_Range("A1", "E1").Merge();
+                    xlSheet.Cells[1, 1] = "Ведомость по магазину за " + dateTimePicker1.Value.ToString("dd.MM.yyyy") + "";
+                    xlSheetRange = xlSheet.UsedRange;
+                    xlSheetRange.Columns.AutoFit();
+                    xlSheetRange.Cells.HorizontalAlignment = -4108;
+                    xlSheetRange.Cells.VerticalAlignment = -4108;
+                    xlSheetRange.Rows.AutoFit();
                     (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
                     (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
                     (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
@@ -856,13 +1450,25 @@ namespace Reports
                     releaseObject(xlApp);
 
                 }
+            }
+            else
+            {
+                MessageBox.Show("Данных по магазину за выбранный период не было!");
+            }
+
         }
 
 
-        public void ReportForMonth()
+
+        public void TodayReportShop()
         {
 
-
+            string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
                 MessageBox.Show("Данные экспортированы в Excel");
                 xlApp = new Excel.Application();
                 xlApp = new Excel.Application();
@@ -873,7 +1479,7 @@ namespace Reports
                     xlApp.EnableEvents = false;
                     xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
                     xlSheet.Name = "Данные";
-                    DataTable dt = GetDataForMonth();
+                    DataTable dt = GetDataTodayShop();
                     int collInd = 0;
                     int rowInd = 0;
                     string data = "";
@@ -884,7 +1490,6 @@ namespace Reports
                         xlSheet.Cells[2, i + 1] = data;
                         xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
                     }
-
                     for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
                     {
 
@@ -894,22 +1499,199 @@ namespace Reports
                             xlSheet.Cells[rowInd + 3, collInd + 1] = data;
 
                         }
-
                     }
-
-                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итоговая сумма:";
-                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
+                    xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
                     Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
                     tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
                     tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                    xlSheet.get_Range("A1", "G1").Merge();
-                    xlSheet.Cells[1, 1] = "Ведомость за " + dateTimePicker4.Value.Month + " месяц " + dateTimePicker4.Value.Year + " года";
+                    string date2 = DateTime.UtcNow.ToString("dd.MM.yyyy");
+                    xlSheet.get_Range("A1", "E1").Merge();
+                    xlSheet.Cells[1, 1] = "Ведомость по столовой за " + date2 + "";
                     xlSheetRange = xlSheet.UsedRange;
                     xlSheetRange.Columns.AutoFit();
                     xlSheetRange.Cells.HorizontalAlignment = -4108;
                     xlSheetRange.Cells.VerticalAlignment = -4108;
                     xlSheetRange.Rows.AutoFit();
+                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+                finally
+                {
 
+                    xlApp.Visible = true;
+                    xlApp.Interactive = true;
+                    xlApp.ScreenUpdating = true;
+                    xlApp.UserControl = true;
+                    releaseObject(xlSheetRange);
+                    releaseObject(xlSheet);
+                    releaseObject(xlApp);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных по магазину за сегодня не было!");
+            }
+
+        }
+        public void TodayReportKitchen()
+        {
+
+            string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
+                MessageBox.Show("Данные экспортированы в Excel");
+                xlApp = new Excel.Application();
+                xlApp = new Excel.Application();
+                try
+                {
+                    xlApp.Workbooks.Add(Type.Missing);
+                    xlApp.Interactive = false;
+                    xlApp.EnableEvents = false;
+                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                    xlSheet.Name = "Данные";
+                    DataTable dt = GetDataTodaykitchen();
+                    int collInd = 0;
+                    int rowInd = 0;
+                    string data = "";
+
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data = dt.Columns[i].ColumnName.ToString();
+                        xlSheet.Cells[2, i + 1] = data;
+                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                    }
+                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                    {
+
+                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                        {
+                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                        }
+                    }
+                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
+                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
+                    xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
+                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                    string date2 = DateTime.UtcNow.ToString("dd.MM.yyyy");
+                    xlSheet.get_Range("A1", "G1").Merge();
+                    xlSheet.Cells[1, 1] = "Ведомость по столовой за " + date2 + "";
+                    xlSheetRange = xlSheet.UsedRange;
+                    xlSheetRange.Columns.AutoFit();
+                    xlSheetRange.Cells.HorizontalAlignment = -4108;
+                    xlSheetRange.Cells.VerticalAlignment = -4108;
+                    xlSheetRange.Rows.AutoFit();
+                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+                finally
+                {
+
+                    xlApp.Visible = true;
+                    xlApp.Interactive = true;
+                    xlApp.ScreenUpdating = true;
+                    xlApp.UserControl = true;
+                    releaseObject(xlSheetRange);
+                    releaseObject(xlSheet);
+                    releaseObject(xlApp);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных по столовой за сегодня не было!");
+            }
+
+        }
+        public void TodayReport()
+        {
+
+            string date5 = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date5 + "'", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
+                MessageBox.Show("Данные экспортированы в Excel");
+                xlApp = new Excel.Application();
+                xlApp = new Excel.Application();
+                try
+                {
+                    xlApp.Workbooks.Add(Type.Missing);
+                    xlApp.Interactive = false;
+                    xlApp.EnableEvents = false;
+                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                    xlSheet.Name = "Данные";
+                    DataTable dt = GetDataToday();
+                    int collInd = 0;
+                    int rowInd = 0;
+                    string data = "";
+
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data = dt.Columns[i].ColumnName.ToString();
+                        xlSheet.Cells[2, i + 1] = data;
+                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                    }
+                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                    {
+
+                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
+                        {
+                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
+                        }
+                    }
+                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итоговая сумма:";
+                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    string date2 = DateTime.UtcNow.ToString("dd.MM.yyyy");
+                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                    xlSheet.get_Range("A1", "G1").Merge();
+                    xlSheet.Cells[1, 1] = "Общая ведомость за " + date2 + "";
+                    xlSheetRange = xlSheet.UsedRange;
+                    xlSheetRange.Columns.AutoFit();
+                    xlSheetRange.Cells.HorizontalAlignment = -4108;
+                    xlSheetRange.Cells.VerticalAlignment = -4108;
+                    xlSheetRange.Rows.AutoFit();
                     (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
                     (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
                     (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
@@ -939,835 +1721,97 @@ namespace Reports
                     releaseObject(xlApp);
 
                 }
-
-        }
-
-        public void ReportDate()
-        {
-
-                SqlDataAdapter ada3 = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
-                DataTable dt3 = new DataTable();
-                ada3.Fill(dt3);
-                if (dt3.Rows.Count > 0)
-                {
-
-                    string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                    string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                    string date3 = dateTimePicker1.Value.ToString("dd.MM.yyyy");
-                    DataTable dt1 = new DataTable();
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
-                    ada.Fill(dt1);
-                    if (dt1.Rows.Count > 0)
-                    {
-                        MessageBox.Show("Данные экспортированы в Excel");
-                        xlApp = new Excel.Application();
-                        xlApp = new Excel.Application();
-                        try
-                        {
-                            xlApp.Workbooks.Add(Type.Missing);
-                            xlApp.Interactive = false;
-                            xlApp.EnableEvents = false;
-                            xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                            xlSheet.Name = "Данные";
-                            DataTable dt = GetDataDay();
-                            int collInd = 0;
-                            int rowInd = 0;
-                            string data = "";
-
-                            for (int i = 0; i < dt.Columns.Count; i++)
-                            {
-                                data = dt.Columns[i].ColumnName.ToString();
-                                xlSheet.Cells[2, i + 1] = data;
-                                xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                            }
-
-                            for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                            {
-
-                                for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                                {
-                                    data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                    xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                                }
-
-                            }
-                            xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
-                            xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                            xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
-                            xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
-                            Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                            tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                            tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                            xlSheet.get_Range("A1", "G1").Merge();
-                            xlSheet.Cells[1, 1] = "Ведомость за " + date3 + "";
-                            xlSheetRange = xlSheet.UsedRange;
-                            xlSheetRange.Columns.AutoFit();
-                            xlSheetRange.Cells.HorizontalAlignment = -4108;
-                            xlSheetRange.Cells.VerticalAlignment = -4108;
-                            xlSheetRange.Rows.AutoFit();
-                            (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                            (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.ToString());
-                        }
-                        finally
-                        {
-
-                            xlApp.Visible = true;
-                            xlApp.Interactive = true;
-                            xlApp.ScreenUpdating = true;
-                            xlApp.UserControl = true;
-                            releaseObject(xlSheetRange);
-                            releaseObject(xlSheet);
-                            releaseObject(xlApp);
-
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Данных за выбранный период не существует!");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных за выбранный период не существует!");
-                }
-        }
-
-
-        public void ReportShop()
-        {
-
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type=518 ", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataShop();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
-                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        xlSheet.get_Range("A1", "E1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость по магазину за " + DateTime.Now.Month + " месяц " + DateTime.Now.Year + " года";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных по магвзину за месяц не было!");
-                }
-        }
-
-        public void ReportForkitchenproducts()
-        {
-
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО, summa As Сумма, val As Собственная,val1 As Готовая, type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type = 521", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataForMonthkitchenhedproducts();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
-                        xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
-                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        xlSheet.get_Range("A1", "G1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость по столовой за " + DateTime.Now.Month + " месяц " + DateTime.Now.Year + " года";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных по столовой не было!");
-                }
-        }
-
-
-        public void ReportKitchenPerDate()
-        {
-
-                string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataDayKitchen();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
-                        xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
-                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        xlSheet.get_Range("A1", "G1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость по столовой за " + dateTimePicker1.Value.ToString("dd.MM.yyyy") + "";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных по столовой за выбранный период не было!");
-                }
-
-        }
-
-
-
-        public void ReportShopPerDate()
-        {
-
-                string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
-                string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataDayShop();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
-                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        xlSheet.get_Range("A1", "E1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость по магазину за " + dateTimePicker1.Value.ToString("dd.MM.yyyy") + "";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных по магазину за выбранный период не было!");
-                }
-
-        }
-
-
-
-        public void TodayReportShop()
-        {
-
-                string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataTodayShop();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 2] = "Итоговая сумма:";
-                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        string date2 = DateTime.UtcNow.ToString("dd.MM.yyyy");
-                        xlSheet.get_Range("A1", "E1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость по столовой за " + date2 + "";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных по магазину за сегодня не было!");
-                }
-
-        }
-        public void TodayReportKitchen()
-        {
-
-                string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataTodaykitchen();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 4] = "Итого:";
-                        xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        xlSheet.Cells[rowInd + 4, collInd - 2].Formula = "=Sum(" + xlSheet.Cells[1, 5].Address + ":" + xlSheet.Cells[rowInd + 2, 5].Address + ")";
-                        xlSheet.Cells[rowInd + 4, collInd - 1].Formula = "=Sum(" + xlSheet.Cells[1, 6].Address + ":" + xlSheet.Cells[rowInd + 2, 6].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        string date2 = DateTime.UtcNow.ToString("dd.MM.yyyy");
-                        xlSheet.get_Range("A1", "G1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость по столовой за " + date2 + "";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 1] as Excel.Range).Font.Bold = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных по столовой за сегодня не было!");
-                }
-
-        }
-        public void TodayReport()
-        {
-
-                string date5 = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date5 + "'", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
-                {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataToday();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
-
-                        for (int i = 0; i < dt.Columns.Count; i++)
-                        {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
-                        }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 4] = "Итоговая сумма:";
-                        xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[3, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        string date2 = DateTime.UtcNow.ToString("dd.MM.yyyy");
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        xlSheet.get_Range("A1", "G1").Merge();
-                        xlSheet.Cells[1, 1] = "Общая ведомость за " + date2 + "";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
-
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Данных за сегодня не было!");
-                }
+            }
+            else
+            {
+                MessageBox.Show("Данных за сегодня не было!");
+            }
 
         }
         public void FinalyReport()
         {
 
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип, date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "", con);
-                DataTable dt2 = new DataTable();
-                ada2.Fill(dt2);
-                if (dt2.Rows.Count > 0)
+            SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип, date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "", con);
+            DataTable dt2 = new DataTable();
+            ada2.Fill(dt2);
+            if (dt2.Rows.Count > 0)
+            {
+                MessageBox.Show("Данные экспортированы в Excel");
+                xlApp = new Excel.Application();
+                xlApp = new Excel.Application();
+                try
                 {
-                    MessageBox.Show("Данные экспортированы в Excel");
-                    xlApp = new Excel.Application();
-                    xlApp = new Excel.Application();
-                    try
-                    {
-                        xlApp.Workbooks.Add(Type.Missing);
-                        xlApp.Interactive = false;
-                        xlApp.EnableEvents = false;
-                        xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
-                        xlSheet.Name = "Данные";
-                        DataTable dt = GetDataTotal();
-                        int collInd = 0;
-                        int rowInd = 0;
-                        string data = "";
+                    xlApp.Workbooks.Add(Type.Missing);
+                    xlApp.Interactive = false;
+                    xlApp.EnableEvents = false;
+                    xlSheet = (Excel.Worksheet)xlApp.Sheets[1];
+                    xlSheet.Name = "Данные";
+                    DataTable dt = GetDataTotal();
+                    int collInd = 0;
+                    int rowInd = 0;
+                    string data = "";
 
-                        for (int i = 0; i < dt.Columns.Count; i++)
+                    for (int i = 0; i < dt.Columns.Count; i++)
+                    {
+                        data = dt.Columns[i].ColumnName.ToString();
+                        xlSheet.Cells[2, i + 1] = data;
+                        xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                    }
+                    for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
+                    {
+
+                        for (collInd = 0; collInd < dt.Columns.Count; collInd++)
                         {
-                            data = dt.Columns[i].ColumnName.ToString();
-                            xlSheet.Cells[2, i + 1] = data;
-                            xlSheetRange = xlSheet.get_Range("A2:Z2", Type.Missing);
+                            data = dt.Rows[rowInd].ItemArray[collInd].ToString();
+                            xlSheet.Cells[rowInd + 3, collInd + 1] = data;
+
                         }
-                        for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                        {
-
-                            for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                            {
-                                data = dt.Rows[rowInd].ItemArray[collInd].ToString();
-                                xlSheet.Cells[rowInd + 3, collInd + 1] = data;
-
-                            }
-                        }
-                        xlSheet.Cells[rowInd + 4, collInd - 4] = "Итоговая сумма:";
-                        xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
-                        Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
-                        tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-                        tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
-                        xlSheet.get_Range("A1", "G1").Merge();
-                        xlSheet.Cells[1, 1] = "Ведомость за " + DateTime.Now.Month + " месяц " + DateTime.Now.Year + " года";
-                        xlSheetRange = xlSheet.UsedRange;
-                        xlSheetRange.Columns.AutoFit();
-                        xlSheetRange.Cells.HorizontalAlignment = -4108;
-                        xlSheetRange.Cells.VerticalAlignment = -4108;
-                        xlSheetRange.Rows.AutoFit();
-                        (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
-                        (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString());
-                    }
-                    finally
-                    {
-
-                        xlApp.Visible = true;
-                        xlApp.Interactive = true;
-                        xlApp.ScreenUpdating = true;
-                        xlApp.UserControl = true;
-                        releaseObject(xlSheetRange);
-                        releaseObject(xlSheet);
-                        releaseObject(xlApp);
-
-                    }
+                    xlSheet.Cells[rowInd + 4, collInd - 4] = "Итоговая сумма:";
+                    xlSheet.Cells[rowInd + 4, collInd - 3].Formula = "=Sum(" + xlSheet.Cells[1, 4].Address + ":" + xlSheet.Cells[rowInd + 2, 4].Address + ")";
+                    Microsoft.Office.Interop.Excel.Range tRange = xlSheet.UsedRange;
+                    tRange.Borders.LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                    tRange.Borders.Weight = Microsoft.Office.Interop.Excel.XlBorderWeight.xlThin;
+                    xlSheet.get_Range("A1", "G1").Merge();
+                    xlSheet.Cells[1, 1] = "Ведомость за " + DateTime.Now.Month + " месяц " + DateTime.Now.Year + " года";
+                    xlSheetRange = xlSheet.UsedRange;
+                    xlSheetRange.Columns.AutoFit();
+                    xlSheetRange.Cells.HorizontalAlignment = -4108;
+                    xlSheetRange.Cells.VerticalAlignment = -4108;
+                    xlSheetRange.Rows.AutoFit();
+                    (xlSheetRange.Cells[1, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 1] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 2] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 3] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 5] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 6] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 7] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[2, 8] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 4] as Excel.Range).Font.Bold = true;
+                    (xlSheetRange.Cells[rowInd + 4, collInd - 3] as Excel.Range).Font.Bold = true;
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Данных за этот месяц нет!");
+                    MessageBox.Show(ex.ToString());
                 }
+                finally
+                {
+
+                    xlApp.Visible = true;
+                    xlApp.Interactive = true;
+                    xlApp.ScreenUpdating = true;
+                    xlApp.UserControl = true;
+                    releaseObject(xlSheetRange);
+                    releaseObject(xlSheet);
+                    releaseObject(xlApp);
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Данных за этот месяц нет!");
+            }
         }
         void releaseObject(object obj)
         {
@@ -1790,18 +1834,6 @@ namespace Reports
         {
             FinalyReport();
         }
-
-        private void отчётЗаМесяцПоСтоловойToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            button3.Visible = true;
-            panel1.Visible = false;
-        }
-
 
 
         private void button1_Click_1(object sender, EventArgs e)
@@ -1828,62 +1860,62 @@ namespace Reports
         private void button7_Click(object sender, EventArgs e)
         {
 
-                if (radioButton4.Checked)
+            if (radioButton4.Checked)
+            {
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
-                    {
-                        GetDataForMonthhShop();
-                        Sum();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Данных за выбранный период не существует!");
-                    }
-                    radioButton4.Checked = false;
-                }
-                else if (radioButton3.Checked)
-                {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
-                    {
-                        GetDataForMonthKitchen();
-                        Sum();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Данных за выбранный период не существует!");
-                    }
-                    radioButton3.Checked = false;
-                }
-                else if (MessageBox.Show("Вы хотите вывести общие данные?", "Внимание", MessageBoxButtons.YesNo,
-                           MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
-                {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
-                    {
-                        GetDataForMonthh();
-                        Sum();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Данных за выбранный период не существует!");
-                    }
-                    radioButton3.Checked = false;
-                    radioButton4.Checked = false;
+                    GetDataForMonthhShop();
+                    Sum();
                 }
                 else
                 {
-                    MessageBox.Show("Для вывода конкретных данных, выберите код!");
-                    radioButton3.Checked = false;
-                    radioButton4.Checked = false;
+                    MessageBox.Show("Данных за выбранный период не существует!");
                 }
+                radioButton4.Checked = false;
+            }
+            else if (radioButton3.Checked)
+            {
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    GetDataForMonthKitchen();
+                    Sum();
+                }
+                else
+                {
+                    MessageBox.Show("Данных за выбранный период не существует!");
+                }
+                radioButton3.Checked = false;
+            }
+            else if (MessageBox.Show("Вы хотите вывести общие данные?", "Внимание", MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+            {
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    GetDataForMonthh();
+                    Sum();
+                }
+                else
+                {
+                    MessageBox.Show("Данных за выбранный период не существует!");
+                }
+                radioButton3.Checked = false;
+                radioButton4.Checked = false;
+            }
+            else
+            {
+                MessageBox.Show("Для вывода конкретных данных, выберите код!");
+                radioButton3.Checked = false;
+                radioButton4.Checked = false;
+            }
 
 
         }
@@ -1901,22 +1933,22 @@ namespace Reports
                 radioButton3.Checked = false;
             }
             else if (MessageBox.Show("Вы хотите напечатать общие данные?", "Внимание", MessageBoxButtons.YesNo,
-                         MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                         MessageBoxIcon.Question) == DialogResult.Yes)
             {
 
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
-                    DataTable dt = new DataTable();
-                    ada.Fill(dt);
-                    if (dt.Rows.Count > 0)
-                    {
-                        ReportForMonth();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Данных за выбранный период не существует!");
-                    }
-                    radioButton3.Checked = false;
-                    radioButton4.Checked = false;
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
+                DataTable dt = new DataTable();
+                ada.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    ReportForMonth();
+                }
+                else
+                {
+                    MessageBox.Show("Данных за выбранный период не существует!");
+                }
+                radioButton3.Checked = false;
+                radioButton4.Checked = false;
             }
             else
             {
@@ -1944,27 +1976,25 @@ namespace Reports
             if (maskedTextBox1.Text == "")
             {
                 MessageBox.Show("Вы не ввели табель!");
+                return;
+            }
+            if (MessageBox.Show("Вы хотите вывести данные за месяц?", "Внимание", MessageBoxButtons.YesNo,
+                      MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+            {
+                GetDataTabell();
+                Sum();
+                maskedTextBox1.Clear();
             }
             else
             {
-                if (MessageBox.Show("Вы хотите вывести данные за месяц?", "Внимание", MessageBoxButtons.YesNo,
-                          MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                GetDataTabell78();
+                Sum();
+                if (dataGridView1.Rows == null || dataGridView1.Rows.Count == 0)
                 {
-                    GetDataTabell();
+                    MessageBox.Show("По данному табельному данных не существует!");
+                    Ap6Pay();
                     Sum();
                     maskedTextBox1.Clear();
-                }
-                else
-                {
-                    GetDataTabell78();
-                    Sum();
-                    if (dataGridView1.Rows == null || dataGridView1.Rows.Count == 0)
-                    {
-                        MessageBox.Show("По данному табельному данных не существует!");
-                        Ap6Pay();
-                        Sum();
-                        maskedTextBox1.Clear();
-                    }
                 }
             }
 
@@ -2066,92 +2096,132 @@ namespace Reports
             Ap6Pay();
             Sum();
         }
-  
+
 
         private void button13_Click(object sender, EventArgs e)
         {
+            string filePath = "D:\\TEMP";
+            string fileName = "DB" + DateTime.UtcNow.ToString("ddMMyy");
+            if (File.Exists(Path.Combine(filePath, fileName + ".dbf")))
+            {
+                if (MessageBox.Show("Файл уже существует! Удалить старый файл?", "Внимание", MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    return;
+                }
+                try
+                {
+                    File.Delete(Path.Combine(filePath, fileName + ".dbf"));
+                }
+                catch(Exception exp)
+                {
+                    MessageBox.Show("Ошибка удаления файла: " + exp.Message);
+                    return;
+                }
+            }
+            string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";Extended Properties=dBASE IV;User ID=admin;Password=;";
+
+
+            using (OleDbConnection connection = new OleDbConnection(connectionString))
+            using (OleDbCommand command = connection.CreateCommand())
+            {
+                connection.Open();
+                //var columns = dataGridView1.Columns.Cast<DataGridViewColumn>().Select(col => col.Name).Where(col =>col.Contains("Табельный"))
+                //    .Where(col => col.Contains("Сумма"))
+                //    .Where(col => col.Contains("Код"))
+                //    .Where(col => col.Contains("Дата"));
+
+                command.CommandText = string.Format("CREATE TABLE {0}(Tabel integer, SUMMA integer, KOD integer, DAT varchar(20))", fileName); //, string.Join(",", columns)
+                command.ExecuteNonQuery();
+
+                command.CommandText = "insert into"+ fileName +"values ()";
+                
+                command.ExecuteNonQuery();
+            }
+
 
             //SqlCommand command = new SqlCommand();
-            //con.Open();
+
             //command.CommandText = "SELECT Id, tab_no,summa,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
             //command.Connection = con;
             //SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-            //DataTable dt = new DataTable();
-            //sqlDataAdapter.Fill(dt);
+
             //string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //Spire.DataExport.DBF.DBFExport DBFExport = new Spire.DataExport.DBF.DBFExport();
-            //DBFExport.DataSource = Spire.DataExport.Common.ExportSource.DataTable;
-            //DBFExport.DataTable = dt;
-            //DBFExport.ActionAfterExport = Spire.DataExport.Common.ActionType.OpenView;
-            //DBFExport.FileName = "D:/Reports/DM" + date2 + ".dbf";
-            //DBFExport.SaveToFile();
-            //con.Close();
+            //DBFExport dBFExport = new DBFExport();
+            //dBFExport.SQLCommand = command;
+            //dBFExport.ActionAfterExport = Spire.DataExport.Common.ActionType.OpenView;
+            //dBFExport.FileName = "D:/Reports/DM" + date2 + ".dbf";
+
+            //con.Open();
+            //dBFExport.SaveToFile();
+
+            ////con.Close();
 
 
 
 
-            System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            using (var cmd = con.CreateCommand())
-            {
-                cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
-                con.Open();
-                using (var reader = cmd.ExecuteReader())
-                {
-                    string date2 = DateTime.UtcNow.ToString("ddMMyy");
-                    string date3 = DateTime.UtcNow.ToString("MM");
-                    string date4 = DateTime.UtcNow.ToString("yy");
-                    using (var writer = new StreamWriter(@"D:\Reports\DM" + date2 + ".txt"))
-                    {
-                        while (reader.Read())
-                        {
-                            writer.WriteLine(reader[0].ToString() + "   " + reader[1].ToString() + "\t  " + reader[2].ToString() + "   " + date3 + "   " + date4);
-                        }
-                    }
-                }
-                cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 521";
+            //using (var cmd = con.CreateCommand())
+            //{
+            //    cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
+            //    con.Open();
+            //    using (var reader = cmd.ExecuteReader())
+            //    {
+            //        string date2 = DateTime.UtcNow.ToString("ddMMyy");
+            //        string date3 = DateTime.UtcNow.ToString("MM");
+            //        string date4 = DateTime.UtcNow.ToString("yy");
+            //        using (var writer = new StreamWriter(@"D:\Reports\DM" + date2 + ".txt"))
+            //        {
+            //            while (reader.Read())
+            //            {
+            //                writer.WriteLine(reader[0].ToString() + "   " + reader[1].ToString() + "\t  " + reader[2].ToString() + "   " + date3 + "   " + date4);
+            //            }
+            //        }
+            //    }
+            //    cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 521";
 
-                using (var reader2 = cmd.ExecuteReader())
-                {
-                    string date2 = DateTime.UtcNow.ToString("ddMMyy");
-                    string date3 = DateTime.UtcNow.ToString("MM");
-                    string date4 = DateTime.UtcNow.ToString("yy");
-                    using (var writer = new StreamWriter(@"D:\Reports\DS" + date2 + ".txt"))
-                    {
-                        while (reader2.Read())
-                        {
+            //using (var reader2 = cmd.ExecuteReader())
+            //{
+            //    string date2 = DateTime.UtcNow.ToString("ddMMyy");
+            //    string date3 = DateTime.UtcNow.ToString("MM");
+            //    string date4 = DateTime.UtcNow.ToString("yy");
+            //    using (var writer = new StreamWriter(@"D:\Reports\DS" + date2 + ".txt"))
+            //    {
+            //        while (reader2.Read())
+            //        {
 
-                            writer.WriteLine(reader2[0].ToString() + "     " + reader2[1].ToString() + "\t  " + reader2[2].ToString() + "    " + date3 + "    " + date4);
-                        }
-                    }
-                    con.Close();
-                }
+            //            writer.WriteLine(reader2[0].ToString() + "     " + reader2[1].ToString() + "\t  " + reader2[2].ToString() + "    " + date3 + "    " + date4);
+            //        }
+            //    }
+            //    con.Close();
+            //}
 
-            }
+            //}
         }
     }
 }
-    public static class PanelExtensions2
+public static class PanelExtensions2
+{
+    public static void OpenPanel2(this Panel panel)
     {
-        public static void OpenPanel2(this Panel panel)
-        {
-            panel.Dock = DockStyle.Fill;
-            panel.Visible = true;
-        }
-        public static void ClosePanel2(this Panel panel)
-        {
-            panel.Dock = DockStyle.None;
-            panel.Visible = false;
-        }
-        public static void OpenAddPanel2(this Form form, Panel target, List<Panel> addPanels)
-        {
-            addPanels.Except(new List<Panel> { target }).ToList().ForEach(x =>
-            {
-                x.ClosePanel2();
-            });
-
-            target.OpenPanel2();
-        }
+        panel.Dock = DockStyle.Fill;
+        panel.Visible = true;
     }
-    
+    public static void ClosePanel2(this Panel panel)
+    {
+        panel.Dock = DockStyle.None;
+        panel.Visible = false;
+    }
+    public static void OpenAddPanel2(this Form form, Panel target, List<Panel> addPanels)
+    {
+        addPanels.Except(new List<Panel> { target }).ToList().ForEach(x =>
+        {
+            x.ClosePanel2();
+        });
+
+        target.OpenPanel2();
+    }
+}
+
 
