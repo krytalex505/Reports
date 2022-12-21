@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 using System.IO;
-using System.Data.OleDb;
-using System.Data.Odbc;
-using System.Reflection;
-using System.Diagnostics;
-using System.Data.Common;
 
 namespace Reports
 {
@@ -24,93 +15,83 @@ namespace Reports
         Excel.Application xlApp;
         Excel.Worksheet xlSheet;
         Excel.Range xlSheetRange;
+        public SqlConnection con;
+        public string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
 
-
-
-        string stroka = @"Data Source=86.57.137.8,1433;Initial Catalog=ap6pay;Persist Security Info=True;User ID=admin;Password=682830";
         public Form1()
         {
-            InitializeComponent();
-            _addpanels2 = new List<Panel> { panel1, panel3, panel4 };
-            Ap6Pay();
-            Sum();
+                con = new SqlConnection("Data Source=86.57.137.8,1433;Initial Catalog=ap6pay;Persist Security Info=True;User ID=admin;Password=682830");
+                InitializeComponent();
+                _addpanels2 = new List<Panel> { panel1, panel3, panel4 };
+                Ap6Pay();
+                Sum();
+
         }
 
         public void GetDataTabell78()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
+
                 string date6 = dateTimePicker2.Value.ToString("dd.MM.yyyy 00:00");
                 string date7 = dateTimePicker2.Value.ToString("dd.MM.yyyy 23:59");
                 string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker2.Value.Month + "_" + dateTimePicker2.Value.Year + " Where  tab_no='" + maskedTextBox1.Text + "' And date between '" + date6 + "' And '" + date7 + "'";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con );
                 DataSet dataSet = new DataSet();
                 sqlDataAdapter.Fill(dataSet);
                 dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-
-            }
 
         }
 
         public void GetDataTabell()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
+
                 string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where  tab_no='" + maskedTextBox1.Text + "'";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                 DataSet dataSet = new DataSet();
                 sqlDataAdapter.Fill(dataSet);
                 dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
 
-            }
 
         }
 
         public void GetDataForMonthKitchen()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
+
                 string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 521";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                 DataSet dataSet = new DataSet();
                 sqlDataAdapter.Fill(dataSet);
                 dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-            }
+
 
         }
 
 
         public void GetDataForMonthhShop()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
+
                 string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + " Where type = 518";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                 DataSet dataSet = new DataSet();
                 sqlDataAdapter.Fill(dataSet);
                 dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-            }
 
         }
         public void GetDataForMonthh()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
+
                 string command = "SELECT Id, tab_no As Табельный,fio As ФИО ,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                 DataSet dataSet = new DataSet();
                 sqlDataAdapter.Fill(dataSet);
                 dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-            }
 
         }
 
 
         public void Ap6Pay78778()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
-                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", sqlConnection);
+
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", con);
                 DataTable dt = new DataTable();
                 ada.Fill(dt);
                 if (dt.Rows.Count > 0)
@@ -119,7 +100,7 @@ namespace Reports
                     string date10 = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
 
                     string command = "SELECT tab_no ,summa,type,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " where date between '" + date9 + "' and '" + date10 + "'";
-                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                     DataSet dataSet = new DataSet();
                     sqlDataAdapter.Fill(dataSet);
                     dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
@@ -129,21 +110,19 @@ namespace Reports
                     MessageBox.Show("Данных за текущий месяц не существует!");
                 }
 
-            }
         }
 
 
         public void Ap6Pay()
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
-                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", sqlConnection);
+
+                SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "'", con);
                 DataTable dt = new DataTable();
                 ada.Fill(dt);
                 if (dt.Rows.Count > 0)
                 {
                     string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
-                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                     DataSet dataSet = new DataSet();
                     sqlDataAdapter.Fill(dataSet);
                     dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
@@ -153,7 +132,6 @@ namespace Reports
                     MessageBox.Show("Данных за текущий месяц не существует!");
                 }
 
-            }
         }
         public void panelhide()
         {
@@ -164,8 +142,7 @@ namespace Reports
 
         private DataTable GetDataForMonthkitchenhedproducts()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
@@ -187,12 +164,9 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
         private DataTable GetDataTabel()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
                 DataTable dt = new DataTable();
                 try
                 {
@@ -214,13 +188,11 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
         private DataTable GetDataShop()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
@@ -242,15 +214,12 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
 
 
         private DataTable GetDataForMonthShop()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
                 DataTable dt = new DataTable();
                 try
                 {
@@ -272,14 +241,11 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
 
         private DataTable GetDataForMonthKitchenDataPicker()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
                 DataTable dt = new DataTable();
                 try
                 {
@@ -301,15 +267,13 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
 
 
         private DataTable GetDataForMonth()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
@@ -331,17 +295,14 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
         private DataTable GetDataTodayShop()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
                 DataTable dt = new DataTable();
                 try
                 {
-                    string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
+
                     string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518";
                     SqlCommand comm = new SqlCommand(query, con);
                     con.Open();
@@ -360,17 +321,14 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
         private DataTable GetDataTodaykitchen()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
-                    string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
                     string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521";
                     SqlCommand comm = new SqlCommand(query, con);
                     con.Open();
@@ -389,16 +347,13 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
         private DataTable GetDataToday()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
-                    string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
                     string query = @"SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "'";
                     SqlCommand comm = new SqlCommand(query, con);
                     con.Open();
@@ -418,13 +373,10 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
         private DataTable GetDataDayKitchen()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
                 DataTable dt = new DataTable();
                 try
                 {
@@ -448,15 +400,13 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
 
 
         private DataTable GetDataDayShop()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
@@ -480,7 +430,6 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
 
@@ -488,8 +437,7 @@ namespace Reports
 
         private DataTable GetDataDay()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
@@ -513,13 +461,11 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
 
         private DataTable GetDataTotal()
         {
-            using (SqlConnection con = new SqlConnection(stroka))
-            {
+
                 DataTable dt = new DataTable();
                 try
                 {
@@ -541,7 +487,6 @@ namespace Reports
                     con.Dispose();
                 }
                 return dt;
-            }
         }
         private void button3_Click(object sender, EventArgs e)
         {
@@ -552,26 +497,25 @@ namespace Reports
 
         private void button2_Click(object sender, EventArgs e)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
+
 
                 if (radioButton1.Checked)
                 {
 
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", sqlConnection);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
                     {
                         string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
                         string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", sqlConnection);
+                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
                         DataTable dt2 = new DataTable();
                         ada2.Fill(dt2);
                         if (dt2.Rows.Count > 0)
                         {
                             string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 518";
-                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                             DataSet dataSet = new DataSet();
                             sqlDataAdapter.Fill(dataSet);
                             dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
@@ -592,20 +536,20 @@ namespace Reports
                 }
                 else if (radioButton2.Checked)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", sqlConnection);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
                     {
                         string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
                         string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", sqlConnection);
+                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
                         DataTable dt2 = new DataTable();
                         ada2.Fill(dt2);
                         if (dt2.Rows.Count > 0)
                         {
                             string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "' And Type = 521";
-                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                             DataSet dataSet = new DataSet();
                             sqlDataAdapter.Fill(dataSet);
                             dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
@@ -628,20 +572,20 @@ namespace Reports
                 if (MessageBox.Show("Вы хотите вывести общие данные?", "Внимание", MessageBoxButtons.YesNo,
                           MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", sqlConnection);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
                     {
                         string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
                         string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", sqlConnection);
+                        SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
                         DataTable dt2 = new DataTable();
                         ada2.Fill(dt2);
                         if (dt2.Rows.Count > 0)
                         {
                             string command = "SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'";
-                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
+                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, con);
                             DataSet dataSet = new DataSet();
                             sqlDataAdapter.Fill(dataSet);
                             dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
@@ -661,13 +605,12 @@ namespace Reports
                 {
                     MessageBox.Show("Чтобы выводить определённые данные, выберите код!!");
                 }
-            }
+
         }
 
         public void ReportTabel()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
 
                 MessageBox.Show("Данные экспортированы в Excel");
                 xlApp = new Excel.Application();
@@ -741,13 +684,11 @@ namespace Reports
 
                 }
 
-            }
         }
 
         public void ReportForMonthKitchen()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
 
                 MessageBox.Show("Данные экспортированы в Excel");
                 xlApp = new Excel.Application();
@@ -831,15 +772,13 @@ namespace Reports
 
                 }
 
-            }
         }
 
 
 
         public void ReportForMonthShop()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
 
                 MessageBox.Show("Данные экспортированы в Excel");
                 xlApp = new Excel.Application();
@@ -917,15 +856,12 @@ namespace Reports
                     releaseObject(xlApp);
 
                 }
-
-            }
         }
 
 
         public void ReportForMonth()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
 
                 MessageBox.Show("Данные экспортированы в Excel");
                 xlApp = new Excel.Application();
@@ -1004,14 +940,12 @@ namespace Reports
 
                 }
 
-            }
         }
 
         public void ReportDate()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
-                SqlDataAdapter ada3 = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", coon);
+
+                SqlDataAdapter ada3 = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + "'", con);
                 DataTable dt3 = new DataTable();
                 ada3.Fill(dt3);
                 if (dt3.Rows.Count > 0)
@@ -1021,7 +955,7 @@ namespace Reports
                     string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
                     string date3 = dateTimePicker1.Value.ToString("dd.MM.yyyy");
                     DataTable dt1 = new DataTable();
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", coon);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма, val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + dateTimePicker1.Value.Month + "_" + dateTimePicker1.Value.Year + " Where date between '" + date1 + "' And '" + date2 + "'", con);
                     ada.Fill(dt1);
                     if (dt1.Rows.Count > 0)
                     {
@@ -1113,15 +1047,13 @@ namespace Reports
                 {
                     MessageBox.Show("Данных за выбранный период не существует!");
                 }
-            }
         }
 
 
         public void ReportShop()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type=518 ", coon);
+
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type=518 ", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1203,15 +1135,12 @@ namespace Reports
                 {
                     MessageBox.Show("Данных по магвзину за месяц не было!");
                 }
-
-            }
         }
 
         public void ReportForkitchenproducts()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО, summa As Сумма, val As Собственная,val1 As Готовая, type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type = 521", coon);
+
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО, summa As Сумма, val As Собственная,val1 As Готовая, type As Код,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where type = 521", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1297,17 +1226,15 @@ namespace Reports
                 {
                     MessageBox.Show("Данных по столовой не было!");
                 }
-            }
         }
 
 
         public void ReportKitchenPerDate()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
                 string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
                 string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", coon);
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1392,7 +1319,6 @@ namespace Reports
                 {
                     MessageBox.Show("Данных по столовой за выбранный период не было!");
                 }
-            }
 
         }
 
@@ -1400,11 +1326,10 @@ namespace Reports
 
         public void ReportShopPerDate()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
                 string date1 = dateTimePicker1.Value.ToString("dd.MM.yyyy 00:00");
                 string date2 = dateTimePicker1.Value.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", coon);
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date1 + "' And '" + date2 + "' And type = 518", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1486,7 +1411,6 @@ namespace Reports
                 {
                     MessageBox.Show("Данных по магазину за выбранный период не было!");
                 }
-            }
 
         }
 
@@ -1494,10 +1418,9 @@ namespace Reports
 
         public void TodayReportShop()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
                 string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518", coon);
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date As Дата FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 518", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1579,15 +1502,13 @@ namespace Reports
                 {
                     MessageBox.Show("Данных по магазину за сегодня не было!");
                 }
-            }
 
         }
         public void TodayReportKitchen()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
                 string date = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521", coon);
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date + "' And type = 521", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1672,15 +1593,13 @@ namespace Reports
                 {
                     MessageBox.Show("Данных по столовой за сегодня не было!");
                 }
-            }
 
         }
         public void TodayReport()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
                 string date5 = DateTime.UtcNow.ToString("dd.MM.yyyy 23:59");
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date5 + "'", coon);
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + DateTime.Today + "' And '" + date5 + "'", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1764,14 +1683,11 @@ namespace Reports
                     MessageBox.Show("Данных за сегодня не было!");
                 }
 
-            }
-
         }
         public void FinalyReport()
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
-                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип, date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "", coon);
+
+                SqlDataAdapter ada2 = new SqlDataAdapter("SELECT Id, tab_no As Табельный,fio As ФИО,summa As Сумма,val As Собственная,val1 As Готовая,type As Тип, date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "", con);
                 DataTable dt2 = new DataTable();
                 ada2.Fill(dt2);
                 if (dt2.Rows.Count > 0)
@@ -1852,8 +1768,6 @@ namespace Reports
                 {
                     MessageBox.Show("Данных за этот месяц нет!");
                 }
-
-            }
         }
         void releaseObject(object obj)
         {
@@ -1913,11 +1827,10 @@ namespace Reports
 
         private void button7_Click(object sender, EventArgs e)
         {
-            using (SqlConnection coon = new SqlConnection(stroka))
-            {
+
                 if (radioButton4.Checked)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", coon);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
@@ -1933,7 +1846,7 @@ namespace Reports
                 }
                 else if (radioButton3.Checked)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", coon);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
@@ -1950,7 +1863,7 @@ namespace Reports
                 else if (MessageBox.Show("Вы хотите вывести общие данные?", "Внимание", MessageBoxButtons.YesNo,
                            MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                 {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", coon);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
@@ -1971,7 +1884,6 @@ namespace Reports
                     radioButton3.Checked = false;
                     radioButton4.Checked = false;
                 }
-            }
 
 
         }
@@ -1992,9 +1904,7 @@ namespace Reports
                          MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
             {
 
-                using (SqlConnection coon = new SqlConnection(stroka))
-                {
-                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", coon);
+                    SqlDataAdapter ada = new SqlDataAdapter("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'dobor_" + dateTimePicker4.Value.Month + "_" + dateTimePicker4.Value.Year + "'", con);
                     DataTable dt = new DataTable();
                     ada.Fill(dt);
                     if (dt.Rows.Count > 0)
@@ -2007,7 +1917,6 @@ namespace Reports
                     }
                     radioButton3.Checked = false;
                     radioButton4.Checked = false;
-                }
             }
             else
             {
@@ -2157,228 +2066,68 @@ namespace Reports
             Ap6Pay();
             Sum();
         }
-        void ExportDataToTxtDS()
-        {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
-                string date6 = dateTimePicker2.Value.ToString("dd.MM.yyyy 00:00");
-                string date7 = dateTimePicker2.Value.ToString("dd.MM.yyyy 23:59");
-                string command = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 521";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-
-            }
-            string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //This line of code creates a text file for the data export.
-            System.IO.StreamWriter file = new System.IO.StreamWriter(@"D:\Reports\DS" + date2 + ".txt");
-            try
-            {
-                string sLine = "";
-
-                //This for loop loops through each row in the table
-                for (int r = 0; r <= dataGridView1.Rows.Count - 1; r++)
-                {
-                    //This for loop loops through each column, and the row number
-                    //is passed from the for loop above.
-                    for (int c = 0; c <= dataGridView1.Columns.Count - 1; c++)
-                    {
-                        sLine = sLine + dataGridView1.Rows[r].Cells[c].Value;
-                        if (c != dataGridView1.Columns.Count - 1)
-                        {
-                            //A comma is added as a text delimiter in order
-                            //to separate each field in the text file.
-                            //You can choose another character as a delimiter.
-                            sLine = sLine + "\t";
-                        }
-                    }
-                    //The exported text is written to the text file, one line at a time.
-                    file.WriteLine(sLine);
-                    sLine = "";
-                }
-
-                file.Close();
-                // System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (System.Exception err)
-            {
-                System.Windows.Forms.MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                file.Close();
-            }
-        }
-        void ExportDataToTxtDM()
-        {
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
-            {
-                string date6 = dateTimePicker2.Value.ToString("dd.MM.yyyy 00:00");
-                string date7 = dateTimePicker2.Value.ToString("dd.MM.yyyy 23:59");
-                string command = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
-                DataSet dataSet = new DataSet();
-                sqlDataAdapter.Fill(dataSet);
-                dataGridView1.DataSource = dataSet.Tables[0].DefaultView;
-
-            }
-            string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //This line of code creates a text file for the data export.
-            System.IO.StreamWriter file = new System.IO.StreamWriter(@"D:\Reports\DM" + date2 + ".txt");
-            try
-            {
-                string sLine = "";
-
-                //This for loop loops through each row in the table
-                for (int r = 0; r <= dataGridView1.Rows.Count - 1; r++)
-                {
-                    //This for loop loops through each column, and the row number
-                    //is passed from the for loop above.
-                    for (int c = 0; c <= dataGridView1.Columns.Count - 1; c++)
-                    {
-                        sLine = sLine + dataGridView1.Rows[r].Cells[c].Value;
-                        if (c != dataGridView1.Columns.Count - 1)
-                        {
-                            //A comma is added as a text delimiter in order
-                            //to separate each field in the text file.
-                            //You can choose another character as a delimiter.
-                            sLine = sLine + "\t";
-                        }
-                    }
-                    //The exported text is written to the text file, one line at a time.
-                    file.WriteLine(sLine);
-                    sLine = "";
-                }
-
-                file.Close();
-                // System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (System.Exception err)
-            {
-                System.Windows.Forms.MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                file.Close();
-            }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
+  
 
         private void button13_Click(object sender, EventArgs e)
         {
-            //using (OleDbConnection oleDbConnection = new OleDbConnection())
-            //{
-            //    oleDbConnection.ConnectionString = "VFPOLEDB;Data Source=D:/DBFCommander";
-            //    OleDbCommand oleDbCommand = new OleDbCommand();
-            //    oleDbCommand.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
-            //    oleDbCommand.Connection = oleDbConnection;
-            //    using (OleDbDataAdapter da = new OleDbDataAdapter(oleDbCommand))
-            //    {
-            //        DataTable dt = new DataTable();
-            //        da.Fill(dt);
-            //        dataGridView1.DataSource = dt;
-            //    }
-            //}
-            using (SqlConnection sqlConnection = new SqlConnection(stroka))
+
+            //SqlCommand command = new SqlCommand();
+            //con.Open();
+            //command.CommandText = "SELECT Id, tab_no,summa,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
+            //command.Connection = con;
+            //SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
+            //DataTable dt = new DataTable();
+            //sqlDataAdapter.Fill(dt);
+            //string date2 = DateTime.UtcNow.ToString("ddMMyy");
+            //Spire.DataExport.DBF.DBFExport DBFExport = new Spire.DataExport.DBF.DBFExport();
+            //DBFExport.DataSource = Spire.DataExport.Common.ExportSource.DataTable;
+            //DBFExport.DataTable = dt;
+            //DBFExport.ActionAfterExport = Spire.DataExport.Common.ActionType.OpenView;
+            //DBFExport.FileName = "D:/Reports/DM" + date2 + ".dbf";
+            //DBFExport.SaveToFile();
+            //con.Close();
+
+
+
+
+            System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            using (var cmd = con.CreateCommand())
             {
-                string date6 = dateTimePicker2.Value.ToString("dd.MM.yyyy 00:00");
-                string date7 = dateTimePicker2.Value.ToString("dd.MM.yyyy 23:59");
-                SqlCommand command = new SqlCommand();
-                sqlConnection.Open();
-                command.CommandText = "SELECT Id, tab_no,summa,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date6 + "' And '" + date7 + "'";
-                command.Connection = sqlConnection;
+                cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
+                con.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    string date2 = DateTime.UtcNow.ToString("ddMMyy");
+                    string date3 = DateTime.UtcNow.ToString("MM");
+                    string date4 = DateTime.UtcNow.ToString("yy");
+                    using (var writer = new StreamWriter(@"D:\Reports\DM" + date2 + ".txt"))
+                    {
+                        while (reader.Read())
+                        {
+                            writer.WriteLine(reader[0].ToString() + "   " + reader[1].ToString() + "\t  " + reader[2].ToString() + "   " + date3 + "   " + date4);
+                        }
+                    }
+                }
+                cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 521";
 
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-                DataTable dt = new DataTable();
-                sqlDataAdapter.Fill(dt);
-                //string command = "SELECT Id, tab_no,summa,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date6 + "' And '" + date7 + "'";
-                // SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command, sqlConnection);
-                //DataTable dt = new DataTable();
-                //  sqlDataAdapter.Fill(dt);
-             
+                using (var reader2 = cmd.ExecuteReader())
+                {
+                    string date2 = DateTime.UtcNow.ToString("ddMMyy");
+                    string date3 = DateTime.UtcNow.ToString("MM");
+                    string date4 = DateTime.UtcNow.ToString("yy");
+                    using (var writer = new StreamWriter(@"D:\Reports\DS" + date2 + ".txt"))
+                    {
+                        while (reader2.Read())
+                        {
 
-                //DataSet dataSet = new DataSet();
-                //for (rowInd = 0; rowInd < dt.Rows.Count; rowInd++)
-                //{
-
-                //    for (collInd = 0; collInd < dt.Columns.Count; collInd++)
-                //    {
-                //        dataSet.dt.Rows[rowInd].ItemArray[collInd].ToString();
-
-
-                //    }
-
-                //}
-               // String sqlText = "SELECT Id, tab_no,summa,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + " Where date between '" + date6 + "' And '" + date7 + "'";
-               //SqlDataAdapter da = new SqlDataAdapter(sqlText, sqlConnection);
-               // // Создаю сопоставление имени Table, которое дается таблицам по умолчанию
-               // DataTableMapping dtm = da.TableMappings.Add("Table", "Dieta");
-               // // Создаю сопоставление столбцов для таблицы сформировавшейся в результате запроса 
-               // dtm.ColumnMappings.Add("Id", "Id");
-               // dtm.ColumnMappings.Add("tab_no", "tab_no");
-               // dtm.ColumnMappings.Add("summa", "summa");
-               // dtm.ColumnMappings.Add("date", "date");
-               // // Создаю объект DataSet и наполняю его данными
-               // DataSet ds = new DataSet();
-               // da.Fill(ds);
-                string date2 = DateTime.UtcNow.ToString("ddMMyy");
-                Spire.DataExport.DBF.DBFExport DBFExport = new Spire.DataExport.DBF.DBFExport();
-                DBFExport.DataSource = Spire.DataExport.Common.ExportSource.DataTable;
-                DBFExport.DataTable = dt;
-                DBFExport.ActionAfterExport = Spire.DataExport.Common.ActionType.OpenView;
-                DBFExport.FileName = "D:/Reports/DM" + date2 + ".dbf";
-                DBFExport.SaveToFile();
-                sqlConnection.Close();
+                            writer.WriteLine(reader2[0].ToString() + "     " + reader2[1].ToString() + "\t  " + reader2[2].ToString() + "    " + date3 + "    " + date4);
+                        }
+                    }
+                    con.Close();
+                }
 
             }
-
-          
-            //ExportDataToTxtDS();
-            //ExportDataToTxtDM();
-            //System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //MessageBox.Show("Данные экспортированы!");
-            //using (SqlConnection coon = new SqlConnection(stroka))
-            //{
-            //    using (var cmd = coon.CreateCommand())
-            //    {
-            //        cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
-            //        coon.Open();
-            //        using (var reader = cmd.ExecuteReader())
-            //        {
-            //            string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //            string date3 = DateTime.UtcNow.ToString("MM");
-            //            string date4 = DateTime.UtcNow.ToString("yy");
-            //            using (var writer = new StreamWriter(@"D:\Reports\DM" + date2 + ".txt"))
-            //            {
-            //                while (reader.Read())
-            //                {
-            //                    writer.WriteLine(reader[0].ToString() + "\t" + reader[1].ToString() + "\t  " + reader[2].ToString() + "\t" + date3 + "\t" + date4);
-            //                }
-            //            }
-
-            //        }
-
-
-
-            //        cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 521";
-            //        coon.Open();
-            //        using (var reader = cmd.ExecuteReader())
-            //        {
-            //            string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //            string date3 = DateTime.UtcNow.ToString("MM");
-            //            string date4 = DateTime.UtcNow.ToString("yy");
-            //            using (var writer = new StreamWriter(@"D:\Reports\DS" + date2 + ".txt"))
-            //            {
-            //                while (reader.Read())
-            //                {
-
-            //                    writer.WriteLine(reader[0].ToString() + "   " + reader[1].ToString() + "\t  " + reader[2].ToString() + "   " + date3 + "   " + date4);
-            //                }
-            //            }
-
-            //        }
-            //        coon.Close();
-            //    }
-            //}
         }
     }
 }
