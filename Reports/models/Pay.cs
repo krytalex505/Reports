@@ -33,9 +33,9 @@ namespace Reports.models
             pay.Id = pay.ParseValue(reader["id"], val => long.Parse(val));
             pay.TabNom = pay.ParseValue(reader["tab_no"], val => int.Parse(val));
             pay.Name = reader["fio"].ToString();
-            pay.Price = pay.ParseValue(reader["summa"], val => double.Parse(val, new CultureInfo("en-us")));
-            pay.Val = pay.ParseValue(reader["val"], val => double.Parse(val, new CultureInfo("en-us")));
-            pay.Val1 = pay.ParseValue(reader["val1"], val => double.Parse(val, new CultureInfo("en-us")));
+            pay.Price = pay.ParseValue(reader["summa"], val => double.Parse(val));
+            pay.Val = pay.ParseValue(reader["val"], val => double.Parse(val));
+            pay.Val1 = pay.ParseValue(reader["val1"], val => double.Parse(val));
             pay.Type = pay.ParseValue(reader["type"], val => int.Parse(val));
             pay.Date = pay.ParseValue(reader["date"], val => DateTime.Parse(val));
             return pay;

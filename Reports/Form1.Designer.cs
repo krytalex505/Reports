@@ -78,6 +78,7 @@
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
+            this.progressExportToDbf = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -584,12 +585,21 @@
             this.button13.UseVisualStyleBackColor = true;
             this.button13.Click += new System.EventHandler(this.button13_Click);
             // 
+            // progressExportToDbf
+            // 
+            this.progressExportToDbf.Location = new System.Drawing.Point(659, 359);
+            this.progressExportToDbf.Name = "progressExportToDbf";
+            this.progressExportToDbf.Size = new System.Drawing.Size(311, 23);
+            this.progressExportToDbf.TabIndex = 14;
+            this.progressExportToDbf.Visible = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(981, 546);
+            this.Controls.Add(this.progressExportToDbf);
             this.Controls.Add(this.button13);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
@@ -667,6 +677,7 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker2;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button button13;
+        private System.Windows.Forms.ProgressBar progressExportToDbf;
     }
 }
 

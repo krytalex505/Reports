@@ -10,6 +10,7 @@ using Spire.DataExport.DBF;
 using System.Data.OleDb;
 using Reports.models;
 using Reports.service;
+using System.ComponentModel;
 
 namespace Reports
 {
@@ -17,7 +18,7 @@ namespace Reports
     {
         private readonly List<Panel> _addpanels2;
 
-        private List<Pay> pays = new List<Pay>();
+        private IList<Pay> pays = new SortableBindingList<Pay>();
         private DaoService daoService;
         Excel.Application xlApp;
         Excel.Worksheet xlSheet;
@@ -27,7 +28,8 @@ namespace Reports
         private DateTime actualDate;
         public Form1()
         {
-            con = new SqlConnection("Data Source=86.57.137.8,1433;Initial Catalog=ap6pay;Persist Security Info=True;User ID=admin;Password=682830");
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            //con = new SqlConnection("Data Source=86.57.137.8,1433;Initial Catalog=ap6pay;Persist Security Info=True;User ID=admin;Password=682830");
             InitializeComponent();
             daoService = new DaoService();
             _addpanels2 = new List<Panel> { panel1, panel3, panel4 };
@@ -35,10 +37,13 @@ namespace Reports
             //Ap6Pay();
             //Sum();
             dataGridView1.AutoGenerateColumns = true;
-            dataGridView1.DataSource = pays;
-            dataGridView1.Columns["Id"].Visible = false;
+            dataGridView1.DataSource = new BindingSource(pays, null);
+            dataGridView1.Sort(dataGridView1.Columns[0], ListSortDirection.Ascending);
 
-            pays.AddRange(daoService.GetPaysOfMonth(DateTime.Now));
+            foreach (var pay in daoService.GetPaysOfMonth(DateTime.Now))
+                pays.Add(pay);
+
+            dataGridView1.Columns["Id"].Visible = false;
         }
 
         private void OnApplicationExit(object sender, EventArgs e)
@@ -2100,6 +2105,12 @@ namespace Reports
 
         private void button13_Click(object sender, EventArgs e)
         {
+            if (pays.Count == 0)
+            {
+                MessageBox.Show("Список для экспорта пуст!");
+                return;
+            }
+
             string filePath = "D:\\TEMP";
             string fileName = "DB" + DateTime.UtcNow.ToString("ddMMyy");
             if (File.Exists(Path.Combine(filePath, fileName + ".dbf")))
@@ -2113,91 +2124,31 @@ namespace Reports
                 {
                     File.Delete(Path.Combine(filePath, fileName + ".dbf"));
                 }
-                catch(Exception exp)
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка удаления файла: " + exp.Message);
+                    MessageBox.Show(ex.ToString(), "Ошибка удаления файла!", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
             }
-            string connectionString = @"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";Extended Properties=dBASE IV;User ID=admin;Password=;";
+            progressExportToDbf.Value = 0;
+            progressExportToDbf.Visible = true;
+            progressExportToDbf.Maximum = pays.Count;
+            progressExportToDbf.Step = 1;
+            progressExportToDbf.Minimum = 0;
 
-
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
-            using (OleDbCommand command = connection.CreateCommand())
+            try
             {
-                connection.Open();
-                //var columns = dataGridView1.Columns.Cast<DataGridViewColumn>().Select(col => col.Name).Where(col =>col.Contains("Табельный"))
-                //    .Where(col => col.Contains("Сумма"))
-                //    .Where(col => col.Contains("Код"))
-                //    .Where(col => col.Contains("Дата"));
-
-                command.CommandText = string.Format("CREATE TABLE {0}(Tabel integer, SUMMA integer, KOD integer, DAT varchar(20))", fileName); //, string.Join(",", columns)
-                command.ExecuteNonQuery();
-
-                command.CommandText = "insert into"+ fileName +"values ()";
-                
-                command.ExecuteNonQuery();
+                daoService.ExportDataToDbf(pays.ToList(), filePath, fileName, () => progressExportToDbf.PerformStep());
+                MessageBox.Show("Экспорт выполнен успешно!");
             }
-
-
-            //SqlCommand command = new SqlCommand();
-
-            //command.CommandText = "SELECT Id, tab_no,summa,date FROM dbo.dobor_" + DateTime.Now.Month + "_" + DateTime.Now.Year + "";
-            //command.Connection = con;
-            //SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(command);
-
-            //string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //DBFExport dBFExport = new DBFExport();
-            //dBFExport.SQLCommand = command;
-            //dBFExport.ActionAfterExport = Spire.DataExport.Common.ActionType.OpenView;
-            //dBFExport.FileName = "D:/Reports/DM" + date2 + ".dbf";
-
-            //con.Open();
-            //dBFExport.SaveToFile();
-
-            ////con.Close();
-
-
-
-
-            //System.Windows.Forms.MessageBox.Show("Export Complete.", "Program Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            //using (var cmd = con.CreateCommand())
-            //{
-            //    cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 518";
-            //    con.Open();
-            //    using (var reader = cmd.ExecuteReader())
-            //    {
-            //        string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //        string date3 = DateTime.UtcNow.ToString("MM");
-            //        string date4 = DateTime.UtcNow.ToString("yy");
-            //        using (var writer = new StreamWriter(@"D:\Reports\DM" + date2 + ".txt"))
-            //        {
-            //            while (reader.Read())
-            //            {
-            //                writer.WriteLine(reader[0].ToString() + "   " + reader[1].ToString() + "\t  " + reader[2].ToString() + "   " + date3 + "   " + date4);
-            //            }
-            //        }
-            //    }
-            //    cmd.CommandText = "SELECT tab_no ,summa,type FROM dbo.dobor_" + 11 + "_" + 2022 + " Where type = 521";
-
-            //using (var reader2 = cmd.ExecuteReader())
-            //{
-            //    string date2 = DateTime.UtcNow.ToString("ddMMyy");
-            //    string date3 = DateTime.UtcNow.ToString("MM");
-            //    string date4 = DateTime.UtcNow.ToString("yy");
-            //    using (var writer = new StreamWriter(@"D:\Reports\DS" + date2 + ".txt"))
-            //    {
-            //        while (reader2.Read())
-            //        {
-
-            //            writer.WriteLine(reader2[0].ToString() + "     " + reader2[1].ToString() + "\t  " + reader2[2].ToString() + "    " + date3 + "    " + date4);
-            //        }
-            //    }
-            //    con.Close();
-            //}
-
-            //}
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Ошибка экспорта!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            finally
+            {
+                progressExportToDbf.Visible = false;
+            }
         }
     }
 }
