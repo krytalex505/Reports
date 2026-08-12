@@ -28,37 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.button3 = new System.Windows.Forms.Button();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.отчётыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.отчётЗаМесяцToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.отчётЗаМесяцПоСтоловойToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MonthlyReportGeneralButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.MonthlyReportKitchenButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.MonthlyReportShopButton = new System.Windows.Forms.ToolStripMenuItem();
             this.отчётыПоДнямToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.отчётЗаСегодняобщийToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.отчётЗаСегоднямагазинToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.закрытьВкладкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ReportForTodayGeneralButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.ReportForTodayKitchenButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.ReportForTodayShopButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.CloseAllTabsButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
+            this.ViewingDataInATableForDateButton = new System.Windows.Forms.Button();
+            this.CancelViewingDataForDateButton = new System.Windows.Forms.Button();
+            this.ReportDataInExcelForASpecificDateButton = new System.Windows.Forms.Button();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
             this.label11 = new System.Windows.Forms.Label();
@@ -75,159 +65,155 @@
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.dateTimePicker4 = new System.Windows.Forms.DateTimePicker();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.SelectDataForASpecificDateButton = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button9 = new System.Windows.Forms.Button();
             this.button13 = new System.Windows.Forms.Button();
             this.progressExportToDbf = new System.Windows.Forms.ProgressBar();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel3.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(18, 0, 0, 0);
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 32);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(957, 321);
-            this.dataGridView1.TabIndex = 0;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(659, 421);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(310, 35);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Выбрать данные за определённое число";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.отчётыToolStripMenuItem,
             this.отчётыПоДнямToolStripMenuItem,
-            this.закрытьВкладкиToolStripMenuItem,
-            this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem});
+            this.CloseAllTabsButton});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(981, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(977, 24);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             // 
             // отчётыToolStripMenuItem
             // 
             this.отчётыToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.отчётЗаМесяцToolStripMenuItem,
-            this.отчётЗаМесяцПоСтоловойToolStripMenuItem,
-            this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem});
+            this.MonthlyReportGeneralButton,
+            this.MonthlyReportKitchenButton,
+            this.MonthlyReportShopButton});
             this.отчётыToolStripMenuItem.Name = "отчётыToolStripMenuItem";
             this.отчётыToolStripMenuItem.Size = new System.Drawing.Size(111, 20);
             this.отчётыToolStripMenuItem.Text = "Отчёты за месяц";
             // 
-            // отчётЗаМесяцToolStripMenuItem
+            // MonthlyReportGeneralButton
             // 
-            this.отчётЗаМесяцToolStripMenuItem.Name = "отчётЗаМесяцToolStripMenuItem";
-            this.отчётЗаМесяцToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.отчётЗаМесяцToolStripMenuItem.Text = "Отчёт за месяц (общий)";
-            this.отчётЗаМесяцToolStripMenuItem.Click += new System.EventHandler(this.отчётЗаМесяцToolStripMenuItem_Click);
+            this.MonthlyReportGeneralButton.Name = "MonthlyReportGeneralButton";
+            this.MonthlyReportGeneralButton.Size = new System.Drawing.Size(218, 22);
+            this.MonthlyReportGeneralButton.Text = "Отчёт за месяц (общий)";
+            this.MonthlyReportGeneralButton.Click += new System.EventHandler(this.MonthlyReportGeneralButton_Click);
             // 
-            // отчётЗаМесяцПоСтоловойToolStripMenuItem
+            // MonthlyReportKitchenButton
             // 
-            this.отчётЗаМесяцПоСтоловойToolStripMenuItem.Name = "отчётЗаМесяцПоСтоловойToolStripMenuItem";
-            this.отчётЗаМесяцПоСтоловойToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.отчётЗаМесяцПоСтоловойToolStripMenuItem.Text = "Отчёт за месяц (столовая)";
-            this.отчётЗаМесяцПоСтоловойToolStripMenuItem.Click += new System.EventHandler(this.отчётЗаМесяцПоСтоловойToolStripMenuItem_Click_1);
+            this.MonthlyReportKitchenButton.Name = "MonthlyReportKitchenButton";
+            this.MonthlyReportKitchenButton.Size = new System.Drawing.Size(218, 22);
+            this.MonthlyReportKitchenButton.Text = "Отчёт за месяц (столовая)";
+            this.MonthlyReportKitchenButton.Click += new System.EventHandler(this.MonthlyReportKitchenButton_Click);
             // 
-            // отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem
+            // MonthlyReportShopButton
             // 
-            this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem.Name = "отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem";
-            this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
-            this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem.Text = "Отчёт за месяц  (магазин)";
-            this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem.Click += new System.EventHandler(this.отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem_Click);
+            this.MonthlyReportShopButton.Name = "MonthlyReportShopButton";
+            this.MonthlyReportShopButton.Size = new System.Drawing.Size(218, 22);
+            this.MonthlyReportShopButton.Text = "Отчёт за месяц  (магазин)";
+            this.MonthlyReportShopButton.Click += new System.EventHandler(this.MonthlyReportShopButton_Click);
             // 
             // отчётыПоДнямToolStripMenuItem
             // 
             this.отчётыПоДнямToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.отчётЗаСегодняобщийToolStripMenuItem,
-            this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem,
-            this.отчётЗаСегоднямагазинToolStripMenuItem});
+            this.ReportForTodayGeneralButton,
+            this.ReportForTodayKitchenButton,
+            this.ReportForTodayShopButton});
             this.отчётыПоДнямToolStripMenuItem.Name = "отчётыПоДнямToolStripMenuItem";
             this.отчётыПоДнямToolStripMenuItem.Size = new System.Drawing.Size(108, 20);
             this.отчётыПоДнямToolStripMenuItem.Text = "Отчёты по дням";
             // 
-            // отчётЗаСегодняобщийToolStripMenuItem
+            // ReportForTodayGeneralButton
             // 
-            this.отчётЗаСегодняобщийToolStripMenuItem.Name = "отчётЗаСегодняобщийToolStripMenuItem";
-            this.отчётЗаСегодняобщийToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-            this.отчётЗаСегодняобщийToolStripMenuItem.Text = "Отчёт за сегодня (общий)";
-            this.отчётЗаСегодняобщийToolStripMenuItem.Click += new System.EventHandler(this.отчётЗаСегодняобщийToolStripMenuItem_Click);
+            this.ReportForTodayGeneralButton.Name = "ReportForTodayGeneralButton";
+            this.ReportForTodayGeneralButton.Size = new System.Drawing.Size(227, 22);
+            this.ReportForTodayGeneralButton.Text = "Отчёт за сегодня (общий)";
+            this.ReportForTodayGeneralButton.Click += new System.EventHandler(this.ReportForTodayGeneralButton_Click);
             // 
-            // отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem
+            // ReportForTodayKitchenButton
             // 
-            this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem.Name = "отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem";
-            this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-            this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem.Text = "Отчёт за сегодня (столовая)";
-            this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem.Click += new System.EventHandler(this.отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem_Click);
+            this.ReportForTodayKitchenButton.Name = "ReportForTodayKitchenButton";
+            this.ReportForTodayKitchenButton.Size = new System.Drawing.Size(227, 22);
+            this.ReportForTodayKitchenButton.Text = "Отчёт за сегодня (столовая)";
+            this.ReportForTodayKitchenButton.Click += new System.EventHandler(this.ReportForTodayKitchenButton_Click);
             // 
-            // отчётЗаСегоднямагазинToolStripMenuItem
+            // ReportForTodayShopButton
             // 
-            this.отчётЗаСегоднямагазинToolStripMenuItem.Name = "отчётЗаСегоднямагазинToolStripMenuItem";
-            this.отчётЗаСегоднямагазинToolStripMenuItem.Size = new System.Drawing.Size(227, 22);
-            this.отчётЗаСегоднямагазинToolStripMenuItem.Text = "Отчёт за сегодня (магазин)";
-            this.отчётЗаСегоднямагазинToolStripMenuItem.Click += new System.EventHandler(this.отчётЗаСегоднямагазинToolStripMenuItem_Click);
+            this.ReportForTodayShopButton.Name = "ReportForTodayShopButton";
+            this.ReportForTodayShopButton.Size = new System.Drawing.Size(227, 22);
+            this.ReportForTodayShopButton.Text = "Отчёт за сегодня (магазин)";
+            this.ReportForTodayShopButton.Click += new System.EventHandler(this.ReportForTodayShopButton_Click);
             // 
-            // закрытьВкладкиToolStripMenuItem
+            // CloseAllTabsButton
             // 
-            this.закрытьВкладкиToolStripMenuItem.Name = "закрытьВкладкиToolStripMenuItem";
-            this.закрытьВкладкиToolStripMenuItem.Size = new System.Drawing.Size(112, 20);
-            this.закрытьВкладкиToolStripMenuItem.Text = "Закрыть вкладки";
-            this.закрытьВкладкиToolStripMenuItem.Click += new System.EventHandler(this.закрытьВкладкиToolStripMenuItem_Click);
+            this.CloseAllTabsButton.Name = "CloseAllTabsButton";
+            this.CloseAllTabsButton.Size = new System.Drawing.Size(112, 20);
+            this.CloseAllTabsButton.Text = "Закрыть вкладки";
+            this.CloseAllTabsButton.Click += new System.EventHandler(this.CloseAllTabsButton_Click);
             // 
-            // обновитьДанныеНаТекущуюСекундуToolStripMenuItem
+            // dataGridView1
             // 
-            this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem.Name = "обновитьДанныеНаТекущуюСекундуToolStripMenuItem";
-            this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem.Size = new System.Drawing.Size(232, 20);
-            this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem.Text = "Обновить данные на текущую секунду";
-            this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem.Click += new System.EventHandler(this.обновитьДанныеНаТекущуюСекундуToolStripMenuItem_Click);
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.Padding = new System.Windows.Forms.Padding(18, 0, 0, 0);
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle8;
+            this.dataGridView1.Location = new System.Drawing.Point(12, 32);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.Size = new System.Drawing.Size(957, 321);
+            this.dataGridView1.TabIndex = 0;
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.radioButton2);
             this.panel1.Controls.Add(this.radioButton1);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.button2);
-            this.panel1.Controls.Add(this.button1);
-            this.panel1.Controls.Add(this.button4);
+            this.panel1.Controls.Add(this.ViewingDataInATableForDateButton);
+            this.panel1.Controls.Add(this.CancelViewingDataForDateButton);
+            this.panel1.Controls.Add(this.ReportDataInExcelForASpecificDateButton);
             this.panel1.Controls.Add(this.dateTimePicker1);
-            this.panel1.Location = new System.Drawing.Point(512, 125);
+            this.panel1.Location = new System.Drawing.Point(96, 151);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(124, 25);
+            this.panel1.Size = new System.Drawing.Size(25, 13);
             this.panel1.TabIndex = 9;
             this.panel1.Visible = false;
             // 
@@ -265,35 +251,35 @@
             this.label1.TabIndex = 9;
             this.label1.Text = "Выберите код:";
             // 
-            // button2
+            // ViewingDataInATableForDateButton
             // 
-            this.button2.Location = new System.Drawing.Point(19, 95);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(306, 35);
-            this.button2.TabIndex = 8;
-            this.button2.Text = "Просмотр данных";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.ViewingDataInATableForDateButton.Location = new System.Drawing.Point(19, 95);
+            this.ViewingDataInATableForDateButton.Name = "ViewingDataInATableForDateButton";
+            this.ViewingDataInATableForDateButton.Size = new System.Drawing.Size(306, 35);
+            this.ViewingDataInATableForDateButton.TabIndex = 8;
+            this.ViewingDataInATableForDateButton.Text = "Просмотр данных";
+            this.ViewingDataInATableForDateButton.UseVisualStyleBackColor = true;
+            this.ViewingDataInATableForDateButton.Click += new System.EventHandler(this.ViewingDataInATableForDateButton_Click);
             // 
-            // button1
+            // CancelViewingDataForDateButton
             // 
-            this.button1.Location = new System.Drawing.Point(20, 133);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(306, 35);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Отмена";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.CancelViewingDataForDateButton.Location = new System.Drawing.Point(20, 133);
+            this.CancelViewingDataForDateButton.Name = "CancelViewingDataForDateButton";
+            this.CancelViewingDataForDateButton.Size = new System.Drawing.Size(306, 35);
+            this.CancelViewingDataForDateButton.TabIndex = 7;
+            this.CancelViewingDataForDateButton.Text = "Отмена";
+            this.CancelViewingDataForDateButton.UseVisualStyleBackColor = true;
+            this.CancelViewingDataForDateButton.Click += new System.EventHandler(this.CancelViewingDataForDateButton_Click);
             // 
-            // button4
+            // ReportDataInExcelForASpecificDateButton
             // 
-            this.button4.Location = new System.Drawing.Point(332, 133);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(207, 35);
-            this.button4.TabIndex = 6;
-            this.button4.Text = "Печать в Excel";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.ReportDataInExcelForASpecificDateButton.Location = new System.Drawing.Point(332, 133);
+            this.ReportDataInExcelForASpecificDateButton.Name = "ReportDataInExcelForASpecificDateButton";
+            this.ReportDataInExcelForASpecificDateButton.Size = new System.Drawing.Size(207, 35);
+            this.ReportDataInExcelForASpecificDateButton.TabIndex = 6;
+            this.ReportDataInExcelForASpecificDateButton.Text = "Печать в Excel";
+            this.ReportDataInExcelForASpecificDateButton.UseVisualStyleBackColor = true;
+            this.ReportDataInExcelForASpecificDateButton.Click += new System.EventHandler(this.ReportDataInExcelForASpecificDateButton_Click);
             // 
             // dateTimePicker1
             // 
@@ -305,86 +291,6 @@
             this.dateTimePicker1.Size = new System.Drawing.Size(306, 20);
             this.dateTimePicker1.TabIndex = 2;
             // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.label9);
-            this.panel2.Controls.Add(this.label8);
-            this.panel2.Controls.Add(this.label7);
-            this.panel2.Controls.Add(this.label6);
-            this.panel2.Controls.Add(this.label5);
-            this.panel2.Controls.Add(this.label4);
-            this.panel2.Controls.Add(this.label3);
-            this.panel2.Controls.Add(this.panel4);
-            this.panel2.Controls.Add(this.panel3);
-            this.panel2.Controls.Add(this.panel1);
-            this.panel2.Location = new System.Drawing.Point(12, 359);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(642, 183);
-            this.panel2.TabIndex = 10;
-            // 
-            // label9
-            // 
-            this.label9.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label9.Location = new System.Drawing.Point(492, 50);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(145, 21);
-            this.label9.TabIndex = 19;
-            // 
-            // label8
-            // 
-            this.label8.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label8.Location = new System.Drawing.Point(491, 27);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(143, 21);
-            this.label8.TabIndex = 18;
-            // 
-            // label7
-            // 
-            this.label7.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label7.Location = new System.Drawing.Point(491, 74);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(145, 22);
-            this.label7.TabIndex = 16;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(419, 73);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(75, 22);
-            this.label6.TabIndex = 17;
-            this.label6.Text = "Общая:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(410, 49);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(84, 22);
-            this.label5.TabIndex = 16;
-            this.label5.Text = "Готовая:";
-            // 
-            // label4
-            // 
-            this.label4.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label4.Location = new System.Drawing.Point(365, 26);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(128, 22);
-            this.label4.TabIndex = 15;
-            this.label4.Text = "Собственная:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(465, 3);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(62, 22);
-            this.label3.TabIndex = 14;
-            this.label3.Text = "Итого";
-            // 
             // panel4
             // 
             this.panel4.Controls.Add(this.dateTimePicker2);
@@ -394,9 +300,9 @@
             this.panel4.Controls.Add(this.button10);
             this.panel4.Controls.Add(this.button11);
             this.panel4.Controls.Add(this.button12);
-            this.panel4.Location = new System.Drawing.Point(502, 159);
+            this.panel4.Location = new System.Drawing.Point(104, 125);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(131, 21);
+            this.panel4.Size = new System.Drawing.Size(36, 20);
             this.panel4.TabIndex = 11;
             this.panel4.Visible = false;
             // 
@@ -475,9 +381,9 @@
             this.panel3.Controls.Add(this.button6);
             this.panel3.Controls.Add(this.button7);
             this.panel3.Controls.Add(this.dateTimePicker4);
-            this.panel3.Location = new System.Drawing.Point(356, 98);
+            this.panel3.Location = new System.Drawing.Point(52, 132);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(97, 22);
+            this.panel3.Size = new System.Drawing.Size(26, 13);
             this.panel3.TabIndex = 10;
             this.panel3.Visible = false;
             // 
@@ -555,8 +461,148 @@
             this.dateTimePicker4.Size = new System.Drawing.Size(306, 20);
             this.dateTimePicker4.TabIndex = 2;
             // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label3.Location = new System.Drawing.Point(465, 3);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(62, 22);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "Итого";
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label4.Location = new System.Drawing.Point(365, 26);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(128, 22);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Собственная:";
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label5.Location = new System.Drawing.Point(410, 49);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(84, 22);
+            this.label5.TabIndex = 16;
+            this.label5.Text = "Готовая:";
+            // 
+            // label8
+            // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label8.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label8.Location = new System.Drawing.Point(491, 27);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(143, 21);
+            this.label8.TabIndex = 18;
+            // 
+            // label9
+            // 
+            this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label9.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label9.Location = new System.Drawing.Point(491, 50);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(145, 21);
+            this.label9.TabIndex = 19;
+            // 
+            // panel2
+            // 
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Controls.Add(this.label13);
+            this.panel2.Controls.Add(this.label12);
+            this.panel2.Controls.Add(this.label7);
+            this.panel2.Controls.Add(this.label6);
+            this.panel2.Controls.Add(this.label9);
+            this.panel2.Controls.Add(this.label8);
+            this.panel2.Controls.Add(this.label5);
+            this.panel2.Controls.Add(this.label4);
+            this.panel2.Controls.Add(this.label3);
+            this.panel2.Controls.Add(this.panel3);
+            this.panel2.Controls.Add(this.panel4);
+            this.panel2.Controls.Add(this.panel1);
+            this.panel2.Location = new System.Drawing.Point(12, 359);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(641, 175);
+            this.panel2.TabIndex = 10;
+            // 
+            // label13
+            // 
+            this.label13.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label13.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label13.Location = new System.Drawing.Point(493, 75);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(145, 22);
+            this.label13.TabIndex = 23;
+            // 
+            // label12
+            // 
+            this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label12.Location = new System.Drawing.Point(369, 73);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(125, 22);
+            this.label12.TabIndex = 22;
+            this.label12.Text = "По магазину:";
+            // 
+            // label7
+            // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label7.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label7.Location = new System.Drawing.Point(491, 98);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(145, 22);
+            this.label7.TabIndex = 20;
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label6.Location = new System.Drawing.Point(419, 97);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(75, 22);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Общая:";
+            // 
+            // SelectDataForASpecificDateButton
+            // 
+            this.SelectDataForASpecificDateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SelectDataForASpecificDateButton.Location = new System.Drawing.Point(659, 421);
+            this.SelectDataForASpecificDateButton.Name = "SelectDataForASpecificDateButton";
+            this.SelectDataForASpecificDateButton.Size = new System.Drawing.Size(310, 35);
+            this.SelectDataForASpecificDateButton.TabIndex = 5;
+            this.SelectDataForASpecificDateButton.Text = "Выбрать данные за определённое число";
+            this.SelectDataForASpecificDateButton.UseVisualStyleBackColor = true;
+            this.SelectDataForASpecificDateButton.Click += new System.EventHandler(this.SelectDataForASpecificDateButton_Click);
+            // 
             // button8
             // 
+            this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button8.Location = new System.Drawing.Point(660, 491);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(310, 35);
@@ -567,6 +613,7 @@
             // 
             // button9
             // 
+            this.button9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button9.Location = new System.Drawing.Point(659, 456);
             this.button9.Name = "button9";
             this.button9.Size = new System.Drawing.Size(310, 35);
@@ -577,6 +624,7 @@
             // 
             // button13
             // 
+            this.button13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button13.Location = new System.Drawing.Point(659, 389);
             this.button13.Name = "button13";
             this.button13.Size = new System.Drawing.Size(310, 32);
@@ -587,6 +635,7 @@
             // 
             // progressExportToDbf
             // 
+            this.progressExportToDbf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.progressExportToDbf.Location = new System.Drawing.Point(659, 359);
             this.progressExportToDbf.Name = "progressExportToDbf";
             this.progressExportToDbf.Size = new System.Drawing.Size(311, 23);
@@ -598,86 +647,89 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(981, 546);
+            this.ClientSize = new System.Drawing.Size(977, 546);
             this.Controls.Add(this.progressExportToDbf);
             this.Controls.Add(this.button13);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.SelectDataForASpecificDateButton);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.menuStrip1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Отчёты";
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.Load += new System.EventHandler(this.Form1_Load);
+            this.DoubleClick += new System.EventHandler(this.Form1_DoubleClick);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem отчётыToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem отчётЗаМесяцToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem отчётЗаМесяцПоСтоловойToolStripMenuItem;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.DateTimePicker dateTimePicker4;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ToolStripMenuItem MonthlyReportGeneralButton;
+        private System.Windows.Forms.ToolStripMenuItem MonthlyReportKitchenButton;
+        private System.Windows.Forms.ToolStripMenuItem MonthlyReportShopButton;
+        private System.Windows.Forms.ToolStripMenuItem отчётыПоДнямToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem CloseAllTabsButton;
+        private System.Windows.Forms.ToolStripMenuItem ReportForTodayGeneralButton;
+        private System.Windows.Forms.ToolStripMenuItem ReportForTodayKitchenButton;
+        private System.Windows.Forms.ToolStripMenuItem ReportForTodayShopButton;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.ToolStripMenuItem отчётЗаМесяцПоГотовойПродукцииToolStripMenuItem;
-        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Panel panel1;
+        public System.Windows.Forms.RadioButton radioButton2;
+        public System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button ViewingDataInATableForDateButton;
+        private System.Windows.Forms.Button CancelViewingDataForDateButton;
+        private System.Windows.Forms.Button ReportDataInExcelForASpecificDateButton;
+        public System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.DateTimePicker dateTimePicker2;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
         private System.Windows.Forms.MaskedTextBox maskedTextBox1;
         private System.Windows.Forms.Button button10;
         private System.Windows.Forms.Button button11;
         private System.Windows.Forms.Button button12;
-        private System.Windows.Forms.ToolStripMenuItem отчётыПоДнямToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem закрытьВкладкиToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem отчётЗаСегодняобщийToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem отчётЗаСегодняПоПродукциистоловаяToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem отчётЗаСегоднямагазинToolStripMenuItem;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.RadioButton radioButton3;
         private System.Windows.Forms.RadioButton radioButton4;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.DateTimePicker dateTimePicker4;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.ToolStripMenuItem обновитьДанныеНаТекущуюСекундуToolStripMenuItem;
-        private System.Windows.Forms.DateTimePicker dateTimePicker2;
-        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button SelectDataForASpecificDateButton;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button9;
         private System.Windows.Forms.Button button13;
         private System.Windows.Forms.ProgressBar progressExportToDbf;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
     }
 }
 

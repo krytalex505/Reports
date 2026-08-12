@@ -29,7 +29,9 @@ namespace Reports.models
 
         public static Pay Parse(SqlDataReader reader)
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-EN");
             Pay pay = new Pay();
+            pay.Date.ToString("");
             pay.Id = pay.ParseValue(reader["id"], val => long.Parse(val));
             pay.TabNom = pay.ParseValue(reader["tab_no"], val => int.Parse(val));
             pay.Name = reader["fio"].ToString();
@@ -37,8 +39,11 @@ namespace Reports.models
             pay.Val = pay.ParseValue(reader["val"], val => double.Parse(val));
             pay.Val1 = pay.ParseValue(reader["val1"], val => double.Parse(val));
             pay.Type = pay.ParseValue(reader["type"], val => int.Parse(val));
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
             pay.Date = pay.ParseValue(reader["date"], val => DateTime.Parse(val));
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
             return pay;
+            
         }
         private T ParseValue<T>(object val, Func<string, T> parser)
         {
